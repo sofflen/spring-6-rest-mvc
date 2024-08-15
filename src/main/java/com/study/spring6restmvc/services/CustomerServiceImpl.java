@@ -78,7 +78,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer existingCustomer = customersMap.get(id);
         log.info("CustomerService: UpdateCustomer({})\nCustomer before update: {}", id, existingCustomer);
         existingCustomer.setCustomerName(customer.getCustomerName());
-        existingCustomer.setVersion(existingCustomer.getVersion()+1);
+        existingCustomer.setVersion(existingCustomer.getVersion() + 1);
 
         log.info("Customer after update: {}", existingCustomer);
         return existingCustomer;
@@ -89,5 +89,19 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("CustomerService: DeleteCustomerById({})", customerId);
         Customer deletedCustomer = customersMap.remove(customerId);
         log.info("CustomerService: deleteCustomerById deletedCustomer: {}", deletedCustomer);
+    }
+
+    @Override
+    public void patchCustomerById(UUID customerId, Customer customer) {
+        log.info("CustomerService: PatchCustomerById({})", customerId);
+        Customer existingCustomer = customersMap.get(customerId);
+
+        if (customer.getCustomerName() != null)
+            existingCustomer.setCustomerName(customer.getCustomerName());
+
+        existingCustomer.setVersion(existingCustomer.getVersion() + 1);
+        existingCustomer.setUpdatedAt(LocalDateTime.now());
+
+        log.info("CustomerService: PatchCustomerById patchedCustomer: {}", existingCustomer);
     }
 }
