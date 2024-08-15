@@ -44,6 +44,7 @@ public class CustomerServiceImpl implements CustomerService {
         customersMap.put(customer2.getId(), customer2);
         customersMap.put(customer3.getId(), customer3);
     }
+
     @Override
     public Customer getCustomerById(UUID id) {
         log.info("CustomerService: GetCustomerById({})", id);
@@ -55,5 +56,20 @@ public class CustomerServiceImpl implements CustomerService {
     public List<Customer> getAllCustomers() {
         log.info("CustomerService: GetAllCustomers()");
         return new ArrayList<>(customersMap.values());
+    }
+
+    @Override
+    public Customer saveCustomer(Customer customer) {
+        Customer savedCustomer = Customer.builder()
+                .id(UUID.randomUUID())
+                .version(1)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .customerName(customer.getCustomerName())
+                .build();
+
+        customersMap.put(savedCustomer.getId(), savedCustomer);
+        log.info("CustomerService: Save Customer({})", savedCustomer);
+        return savedCustomer;
     }
 }
