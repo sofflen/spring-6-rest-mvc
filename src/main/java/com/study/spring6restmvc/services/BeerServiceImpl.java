@@ -95,6 +95,8 @@ public class BeerServiceImpl implements BeerService {
         existingBeer.setQuantityOnHand(beer.getQuantityOnHand());
         existingBeer.setModifiedAt(LocalDateTime.now());
         existingBeer.setBeerName(beer.getBeerName());
+        existingBeer.setBeerStyle(beer.getBeerStyle());
+        existingBeer.setVersion(existingBeer.getVersion()+1);
 
         log.info("Beer after update: {}", existingBeer);
         return existingBeer;

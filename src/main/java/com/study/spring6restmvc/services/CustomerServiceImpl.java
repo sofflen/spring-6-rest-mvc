@@ -72,4 +72,15 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("CustomerService: Save Customer({})", savedCustomer);
         return savedCustomer;
     }
+
+    @Override
+    public Customer updateCustomerById(UUID id, Customer customer) {
+        Customer existingCustomer = customersMap.get(id);
+        log.info("CustomerService: UpdateCustomer({})\nCustomer before update: {}", id, existingCustomer);
+        existingCustomer.setCustomerName(customer.getCustomerName());
+        existingCustomer.setVersion(existingCustomer.getVersion()+1);
+
+        log.info("Customer after update: {}", existingCustomer);
+        return existingCustomer;
+    }
 }
