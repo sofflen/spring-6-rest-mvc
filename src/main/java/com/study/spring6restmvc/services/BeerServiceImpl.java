@@ -96,10 +96,17 @@ public class BeerServiceImpl implements BeerService {
         existingBeer.setModifiedAt(LocalDateTime.now());
         existingBeer.setBeerName(beer.getBeerName());
         existingBeer.setBeerStyle(beer.getBeerStyle());
-        existingBeer.setVersion(existingBeer.getVersion()+1);
+        existingBeer.setVersion(existingBeer.getVersion() + 1);
 
         log.info("Beer after update: {}", existingBeer);
         return existingBeer;
+    }
+
+    @Override
+    public void deleteBeerById(UUID beerId) {
+        log.info("BeerService: deleteBeerById({})", beerId);
+        Beer deletedBeer = beersMap.remove(beerId);
+        log.info("BeerService: deleteBeerById deletedBeer: {}", deletedBeer);
     }
 
     @Override
