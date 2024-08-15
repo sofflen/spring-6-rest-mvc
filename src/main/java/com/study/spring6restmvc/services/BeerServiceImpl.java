@@ -28,8 +28,8 @@ public class BeerServiceImpl implements BeerService {
                 .upc("12356")
                 .price(new BigDecimal("12.99"))
                 .quantityOnHand(122)
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
                 .build();
 
         Beer beer2 = Beer.builder()
@@ -40,8 +40,8 @@ public class BeerServiceImpl implements BeerService {
                 .upc("12356222")
                 .price(new BigDecimal("11.99"))
                 .quantityOnHand(392)
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
                 .build();
 
         Beer beer3 = Beer.builder()
@@ -52,17 +52,37 @@ public class BeerServiceImpl implements BeerService {
                 .upc("12356")
                 .price(new BigDecimal("13.99"))
                 .quantityOnHand(144)
-                .createdDate(LocalDateTime.now())
-                .modifiedDate(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
                 .build();
 
         beersMap.put(beer1.getId(), beer1);
         beersMap.put(beer2.getId(), beer2);
         beersMap.put(beer3.getId(), beer3);
     }
+
     @Override
     public List<Beer> getAllBeers() {
         return new ArrayList<>(beersMap.values());
+    }
+
+    @Override
+    public Beer saveBeer(Beer beer) {
+        Beer savedBeer = Beer.builder()
+                .id(UUID.randomUUID())
+                .version(1)
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
+                .upc(beer.getUpc())
+                .price(beer.getPrice())
+                .quantityOnHand(beer.getQuantityOnHand())
+                .beerStyle(beer.getBeerStyle())
+                .beerName(beer.getBeerName())
+                .build();
+
+        beersMap.put(savedBeer.getId(), savedBeer);
+        log.info("BeerService: Saved Beer: {}", savedBeer);
+        return savedBeer;
     }
 
     @Override

@@ -17,6 +17,6 @@ public class Beer {
     private Integer quantityOnHand;
     private BigDecimal price;
     private Integer version;
-    private LocalDateTime createdDate;
-    private LocalDateTime modifiedDate;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 }
