@@ -19,7 +19,7 @@ public class BeerServiceImpl implements BeerService {
 
     private final Map<UUID, Beer> beersMap = new HashMap<>();
 
-    BeerServiceImpl() {
+    public BeerServiceImpl() {
         Beer beer1 = Beer.builder()
                 .id(UUID.randomUUID())
                 .version(1)
@@ -63,6 +63,7 @@ public class BeerServiceImpl implements BeerService {
 
     @Override
     public List<Beer> getAllBeers() {
+        log.info("BeerService: getAllBeers");
         return new ArrayList<>(beersMap.values());
     }
 
