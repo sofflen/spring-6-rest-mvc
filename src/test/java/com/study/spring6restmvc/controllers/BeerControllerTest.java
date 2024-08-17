@@ -59,6 +59,24 @@ class BeerControllerTest {
     }
 
     @Test
+    void patchBeerById() throws Exception {
+        Beer testBeer = beerServiceImpl.getAllBeers().getFirst();
+        Map<String, String> jsonMap = new HashMap<>();
+        jsonMap.put("beerName", "Beer Name");
+
+        mockMvc.perform(patch("/api/v1/beer/{id}", testBeer.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(jsonMap)))
+                .andExpect(status().isNoContent());
+
+        verify(beerService).patchBeerById(uuidArgumentCaptor.capture(), beerArgumentCaptor.capture());
+
+        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(testBeer.getId());
+        assertThat(beerArgumentCaptor.getValue().getBeerName()).isEqualTo(jsonMap.get("beerName"));
+    }
+
+    @Test
     void deleteBeer() throws Exception {
         Beer testBeer = beerServiceImpl.getAllBeers().getFirst();
 
