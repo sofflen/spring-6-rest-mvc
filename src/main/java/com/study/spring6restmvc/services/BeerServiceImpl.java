@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -31,7 +32,6 @@ public class BeerServiceImpl implements BeerService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-
         Beer beer2 = Beer.builder()
                 .id(UUID.randomUUID())
                 .version(1)
@@ -43,7 +43,6 @@ public class BeerServiceImpl implements BeerService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-
         Beer beer3 = Beer.builder()
                 .id(UUID.randomUUID())
                 .version(1)
@@ -64,6 +63,7 @@ public class BeerServiceImpl implements BeerService {
     @Override
     public List<Beer> getAllBeers() {
         log.info("BeerService: getAllBeers");
+
         return new ArrayList<>(beersMap.values());
     }
 
@@ -82,13 +82,16 @@ public class BeerServiceImpl implements BeerService {
                 .build();
 
         beersMap.put(savedBeer.getId(), savedBeer);
+
         log.info("BeerService: Saved Beer: {}", savedBeer);
+
         return savedBeer;
     }
 
     @Override
-    public Beer updateBeerById(UUID beerId, Beer beer) {
+    public void updateBeerById(UUID beerId, Beer beer) {
         Beer existingBeer = beersMap.get(beerId);
+
         log.info("BeerService: Updating Beer: {}\nBeer before update: {}", beerId, existingBeer);
 
         existingBeer.setUpc(beer.getUpc());
@@ -100,19 +103,21 @@ public class BeerServiceImpl implements BeerService {
         existingBeer.setVersion(existingBeer.getVersion() + 1);
 
         log.info("Beer after update: {}", existingBeer);
-        return existingBeer;
     }
 
     @Override
     public void deleteBeerById(UUID beerId) {
         log.info("BeerService: deleteBeerById({})", beerId);
+
         Beer deletedBeer = beersMap.remove(beerId);
+
         log.info("BeerService: deleteBeerById deletedBeer: {}", deletedBeer);
     }
 
     @Override
     public void patchBeerById(UUID beerId, Beer beer) {
         log.info("BeerService: patchBeerById({})", beerId);
+
         Beer existingBeer = beersMap.get(beerId);
 
         if (beer.getUpc() != null)
@@ -128,13 +133,14 @@ public class BeerServiceImpl implements BeerService {
 
         existingBeer.setVersion(existingBeer.getVersion() + 1);
         existingBeer.setUpdatedAt(LocalDateTime.now());
+
         log.info("BeerService: patchBeerById patchedBeer: {}", existingBeer);
     }
 
     @Override
-    public Beer getBeerById(UUID id) {
+    public Optional<Beer> getBeerById(UUID id) {
         log.info("BeerService: getBeerById({})", id);
 
-        return beersMap.get(id);
+        return Optional.ofNullable(beersMap.get(id));
     }
 }

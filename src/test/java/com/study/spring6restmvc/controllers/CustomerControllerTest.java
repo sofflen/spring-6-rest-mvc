@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_PATH;
@@ -131,10 +132,20 @@ class CustomerControllerTest {
     }
 
     @Test
+    void getCustomerById_NotFound() throws Exception {
+        Optional<Customer> optionalCustomer = customerServiceImpl.getCustomerById(UUID.randomUUID());
+
+        given(customerService.getCustomerById(any(UUID.class))).willReturn(optionalCustomer);
+
+        mockMvc.perform(get(CUSTOMER_PATH_ID, UUID.randomUUID()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void getCustomerById() throws Exception {
         UUID customerId = testCustomer.getId();
 
-        given(customerService.getCustomerById(customerId)).willReturn(testCustomer);
+        given(customerService.getCustomerById(customerId)).willReturn(Optional.of(testCustomer));
 
         mockMvc.perform(get(CUSTOMER_PATH_ID, testCustomer.getId())
                         .accept(MediaType.APPLICATION_JSON))

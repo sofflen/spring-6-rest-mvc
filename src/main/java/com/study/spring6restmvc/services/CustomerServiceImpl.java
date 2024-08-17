@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -46,15 +47,16 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer getCustomerById(UUID id) {
+    public Optional<Customer> getCustomerById(UUID id) {
         log.info("CustomerService: GetCustomerById({})", id);
 
-        return customersMap.get(id);
+        return Optional.ofNullable(customersMap.get(id));
     }
 
     @Override
     public List<Customer> getAllCustomers() {
         log.info("CustomerService: GetAllCustomers()");
+
         return new ArrayList<>(customersMap.values());
     }
 
@@ -69,31 +71,37 @@ public class CustomerServiceImpl implements CustomerService {
                 .build();
 
         customersMap.put(savedCustomer.getId(), savedCustomer);
+
         log.info("CustomerService: Save Customer({})", savedCustomer);
+
         return savedCustomer;
     }
 
     @Override
-    public Customer updateCustomerById(UUID id, Customer customer) {
+    public void updateCustomerById(UUID id, Customer customer) {
         Customer existingCustomer = customersMap.get(id);
+
         log.info("CustomerService: UpdateCustomer({})\nCustomer before update: {}", id, existingCustomer);
+
         existingCustomer.setCustomerName(customer.getCustomerName());
         existingCustomer.setVersion(existingCustomer.getVersion() + 1);
 
         log.info("Customer after update: {}", existingCustomer);
-        return existingCustomer;
     }
 
     @Override
     public void deleteCustomerById(UUID customerId) {
         log.info("CustomerService: DeleteCustomerById({})", customerId);
+
         Customer deletedCustomer = customersMap.remove(customerId);
+
         log.info("CustomerService: deleteCustomerById deletedCustomer: {}", deletedCustomer);
     }
 
     @Override
     public void patchCustomerById(UUID customerId, Customer customer) {
         log.info("CustomerService: PatchCustomerById({})", customerId);
+
         Customer existingCustomer = customersMap.get(customerId);
 
         if (customer.getCustomerName() != null)

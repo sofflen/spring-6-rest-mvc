@@ -1,5 +1,6 @@
 package com.study.spring6restmvc.controllers;
 
+import com.study.spring6restmvc.exceptions.NotFoundException;
 import com.study.spring6restmvc.model.Customer;
 import com.study.spring6restmvc.services.CustomerService;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,8 @@ public class CustomerController {
     public Customer getCustomerById(@PathVariable("id") UUID customerId) {
         log.info("CustomerController: getCustomerById({})", customerId);
 
-        return customerService.getCustomerById(customerId);
+        return customerService.getCustomerById(customerId)
+                .orElseThrow(NotFoundException::new);
     }
 
     @PostMapping(CUSTOMER_PATH)
