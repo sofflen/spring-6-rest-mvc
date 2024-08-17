@@ -45,12 +45,9 @@ public class BeerController {
     @PutMapping("/{beerId}")
     public ResponseEntity<Beer> updateBeerById(@PathVariable("beerId") UUID beerId, @RequestBody Beer beer) {
         log.info("BeerController: updateBeerById({})", beerId);
-        Beer updatedBeer = beerService.updateBeerById(beerId, beer);
+        beerService.updateBeerById(beerId, beer);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", "/api/v1/beer/" + beerId);
-
-        return new ResponseEntity<>(updatedBeer, headers, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{beerId}")

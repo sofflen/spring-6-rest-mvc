@@ -45,10 +45,9 @@ public class CustomerController {
     public ResponseEntity<Customer> updateCustomerById(@PathVariable("customerId") UUID id,
                                                        @RequestBody Customer customer) {
         log.info("CustomerController: updateCustomerById({})", id);
-        Customer updatedCustomer = customerService.updateCustomerById(id, customer);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", "/api/v1/customer/" + updatedCustomer.getId());
-        return new ResponseEntity<>(updatedCustomer, headers, HttpStatus.OK);
+        customerService.updateCustomerById(id, customer);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{customerId}")
