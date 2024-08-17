@@ -29,7 +29,7 @@ public class BeerServiceImpl implements BeerService {
                 .price(new BigDecimal("12.99"))
                 .quantityOnHand(122)
                 .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
         Beer beer2 = Beer.builder()
@@ -41,7 +41,7 @@ public class BeerServiceImpl implements BeerService {
                 .price(new BigDecimal("11.99"))
                 .quantityOnHand(392)
                 .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
         Beer beer3 = Beer.builder()
@@ -53,7 +53,7 @@ public class BeerServiceImpl implements BeerService {
                 .price(new BigDecimal("13.99"))
                 .quantityOnHand(144)
                 .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
         beersMap.put(beer1.getId(), beer1);
@@ -73,7 +73,7 @@ public class BeerServiceImpl implements BeerService {
                 .id(UUID.randomUUID())
                 .version(1)
                 .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .upc(beer.getUpc())
                 .price(beer.getPrice())
                 .quantityOnHand(beer.getQuantityOnHand())
@@ -94,7 +94,7 @@ public class BeerServiceImpl implements BeerService {
         existingBeer.setUpc(beer.getUpc());
         existingBeer.setPrice(beer.getPrice());
         existingBeer.setQuantityOnHand(beer.getQuantityOnHand());
-        existingBeer.setModifiedAt(LocalDateTime.now());
+        existingBeer.setUpdatedAt(LocalDateTime.now());
         existingBeer.setBeerName(beer.getBeerName());
         existingBeer.setBeerStyle(beer.getBeerStyle());
         existingBeer.setVersion(existingBeer.getVersion() + 1);
@@ -127,7 +127,7 @@ public class BeerServiceImpl implements BeerService {
             existingBeer.setBeerName(beer.getBeerName());
 
         existingBeer.setVersion(existingBeer.getVersion() + 1);
-        existingBeer.setModifiedAt(LocalDateTime.now());
+        existingBeer.setUpdatedAt(LocalDateTime.now());
         log.info("BeerService: patchBeerById patchedBeer: {}", existingBeer);
     }
 

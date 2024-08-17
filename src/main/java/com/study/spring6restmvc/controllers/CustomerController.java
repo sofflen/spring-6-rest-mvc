@@ -37,7 +37,7 @@ public class CustomerController {
         log.info("CustomerController: createCustomer({})", customer);
         Customer savedCustomer = customerService.saveCustomer(customer);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", "api/v1/customer/" + savedCustomer.getId());
+        headers.add("Location", "/api/v1/customer/" + savedCustomer.getId());
         return new ResponseEntity<>(savedCustomer, headers, HttpStatus.CREATED);
     }
 
@@ -47,7 +47,7 @@ public class CustomerController {
         log.info("CustomerController: updateCustomerById({})", id);
         Customer updatedCustomer = customerService.updateCustomerById(id, customer);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", "api/v1/customer/" + updatedCustomer.getId());
+        headers.add("Location", "/api/v1/customer/" + updatedCustomer.getId());
         return new ResponseEntity<>(updatedCustomer, headers, HttpStatus.OK);
     }
 
