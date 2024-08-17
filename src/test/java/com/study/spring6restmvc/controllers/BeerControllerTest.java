@@ -6,20 +6,27 @@ import com.study.spring6restmvc.services.BeerService;
 import com.study.spring6restmvc.services.BeerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -39,11 +46,29 @@ class BeerControllerTest {
     @MockBean
     private BeerService beerService;
 
+    @Captor
+    private ArgumentCaptor<UUID> uuidArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<Beer> beerArgumentCaptor;
+
     private BeerServiceImpl beerServiceImpl;
 
     @BeforeEach
     void setUp() {
         beerServiceImpl = new BeerServiceImpl();
+    }
+
+    @Test
+    void deleteBeer() throws Exception {
+        Beer testBeer = beerServiceImpl.getAllBeers().getFirst();
+
+        mockMvc.perform(delete("/api/v1/beer/{id}", testBeer.getId())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        verify(beerService).deleteBeerById(uuidArgumentCaptor.capture());
+
+        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(testBeer.getId());
     }
 
     @Test
@@ -56,7 +81,9 @@ class BeerControllerTest {
                         .content(objectMapper.writeValueAsString(testBeer)))
                 .andExpect(status().isNoContent());
 
-        verify(beerService).updateBeerById(testBeer.getId(), testBeer);
+        verify(beerService).updateBeerById(uuidArgumentCaptor.capture(), eq(testBeer));
+
+        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(testBeer.getId());
     }
 
     @Test
