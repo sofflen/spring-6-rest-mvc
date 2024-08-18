@@ -1,7 +1,7 @@
 package com.study.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.study.spring6restmvc.model.Customer;
+import com.study.spring6restmvc.model.CustomerDTO;
 import com.study.spring6restmvc.services.CustomerService;
 import com.study.spring6restmvc.services.CustomerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,10 +52,10 @@ class CustomerControllerTest {
     @Captor
     private ArgumentCaptor<UUID> uuidArgumentCaptor;
     @Captor
-    private ArgumentCaptor<Customer> customerArgumentCaptor;
+    private ArgumentCaptor<CustomerDTO> customerArgumentCaptor;
 
     private CustomerServiceImpl customerServiceImpl;
-    private Customer testCustomer;
+    private CustomerDTO testCustomer;
 
     @BeforeEach
     void setUp() {
@@ -106,9 +106,9 @@ class CustomerControllerTest {
 
     @Test
     void createCustomer() throws Exception {
-        Customer customer = Customer.builder().build();
+        CustomerDTO customer = CustomerDTO.builder().build();
 
-        given(customerService.saveCustomer(any(Customer.class))).willReturn(testCustomer);
+        given(customerService.saveCustomer(any(CustomerDTO.class))).willReturn(testCustomer);
 
         mockMvc.perform(post(CUSTOMER_PATH)
                         .accept(MediaType.APPLICATION_JSON)
@@ -133,7 +133,7 @@ class CustomerControllerTest {
 
     @Test
     void getCustomerById_NotFound() throws Exception {
-        Optional<Customer> optionalCustomer = customerServiceImpl.getCustomerById(UUID.randomUUID());
+        Optional<CustomerDTO> optionalCustomer = customerServiceImpl.getCustomerById(UUID.randomUUID());
 
         given(customerService.getCustomerById(any(UUID.class))).willReturn(optionalCustomer);
 

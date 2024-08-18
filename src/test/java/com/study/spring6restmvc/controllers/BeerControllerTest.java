@@ -1,7 +1,7 @@
 package com.study.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.study.spring6restmvc.model.Beer;
+import com.study.spring6restmvc.model.BeerDTO;
 import com.study.spring6restmvc.services.BeerService;
 import com.study.spring6restmvc.services.BeerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,10 +52,10 @@ class BeerControllerTest {
     @Captor
     private ArgumentCaptor<UUID> uuidArgumentCaptor;
     @Captor
-    private ArgumentCaptor<Beer> beerArgumentCaptor;
+    private ArgumentCaptor<BeerDTO> beerArgumentCaptor;
 
     private BeerServiceImpl beerServiceImpl;
-    private Beer testBeer;
+    private BeerDTO testBeer;
 
     @BeforeEach
     void setUp() {
@@ -106,9 +106,9 @@ class BeerControllerTest {
 
     @Test
     void createBeer() throws Exception {
-        Beer beer = Beer.builder().build();
+        BeerDTO beer = BeerDTO.builder().build();
 
-        given(beerService.saveBeer(any(Beer.class))).willReturn(testBeer);
+        given(beerService.saveBeer(any(BeerDTO.class))).willReturn(testBeer);
 
         mockMvc.perform(post(BEER_PATH)
                         .accept(MediaType.APPLICATION_JSON)
@@ -133,7 +133,7 @@ class BeerControllerTest {
 
     @Test
     void getBeerById_NotFound() throws Exception {
-        Optional<Beer> optionalBeer = beerServiceImpl.getBeerById(UUID.randomUUID());
+        Optional<BeerDTO> optionalBeer = beerServiceImpl.getBeerById(UUID.randomUUID());
 
         given(beerService.getBeerById(any(UUID.class))).willReturn(optionalBeer);
 
