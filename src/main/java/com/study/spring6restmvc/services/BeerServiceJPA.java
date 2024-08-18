@@ -20,13 +20,18 @@ public class BeerServiceJPA implements BeerService {
     private final BeerMapper beerMapper;
 
     @Override
-    public Optional<BeerDTO> getBeerById(UUID uuid) {
-        return Optional.empty();
+    public Optional<BeerDTO> getBeerById(UUID beerId) {
+        return Optional.ofNullable(
+                beerMapper.beerToBeerDTO(
+                        beerRepository.findById(beerId).orElse(null)));
     }
 
     @Override
     public List<BeerDTO> getAllBeers() {
-        return List.of();
+        return beerRepository.findAll()
+                .stream()
+                .map(beerMapper::beerToBeerDTO)
+                .toList();
     }
 
     @Override
