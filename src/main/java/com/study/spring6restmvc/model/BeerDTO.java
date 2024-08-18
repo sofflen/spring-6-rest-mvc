@@ -11,12 +11,12 @@ import java.util.UUID;
 @Data
 public class BeerDTO {
     private UUID id;
+    private Integer version;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String beerName;
     private String upc;
     private BeerStyle beerStyle;
     private Integer quantityOnHand;
     private BigDecimal price;
-    private Integer version;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }
