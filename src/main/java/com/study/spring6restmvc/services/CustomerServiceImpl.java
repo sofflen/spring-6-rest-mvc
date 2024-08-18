@@ -47,10 +47,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Optional<CustomerDTO> getCustomerById(UUID id) {
-        log.info("CustomerService: GetCustomerById({})", id);
+    public Optional<CustomerDTO> getCustomerById(UUID customerId) {
+        log.info("CustomerService: GetCustomerById({})", customerId);
 
-        return Optional.ofNullable(customersMap.get(id));
+        return Optional.ofNullable(customersMap.get(customerId));
     }
 
     @Override
@@ -78,28 +78,32 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void updateCustomerById(UUID id, CustomerDTO customer) {
-        CustomerDTO existingCustomer = customersMap.get(id);
+    public Optional<CustomerDTO> updateCustomerById(UUID customerId, CustomerDTO customer) {
+        CustomerDTO existingCustomer = customersMap.get(customerId);
 
-        log.info("CustomerService: UpdateCustomer({})\nCustomer before update: {}", id, existingCustomer);
+        log.info("CustomerService: UpdateCustomer({})\nCustomer before update: {}", customerId, existingCustomer);
 
         existingCustomer.setCustomerName(customer.getCustomerName());
         existingCustomer.setVersion(existingCustomer.getVersion() + 1);
 
         log.info("Customer after update: {}", existingCustomer);
+
+        return Optional.of(existingCustomer);
     }
 
     @Override
-    public void deleteCustomerById(UUID customerId) {
+    public boolean deleteCustomerById(UUID customerId) {
         log.info("CustomerService: DeleteCustomerById({})", customerId);
 
         CustomerDTO deletedCustomer = customersMap.remove(customerId);
 
         log.info("CustomerService: deleteCustomerById deletedCustomer: {}", deletedCustomer);
+
+        return true;
     }
 
     @Override
-    public void patchCustomerById(UUID customerId, CustomerDTO customer) {
+    public Optional<CustomerDTO> patchCustomerById(UUID customerId, CustomerDTO customer) {
         log.info("CustomerService: PatchCustomerById({})", customerId);
 
         CustomerDTO existingCustomer = customersMap.get(customerId);
@@ -111,5 +115,7 @@ public class CustomerServiceImpl implements CustomerService {
         existingCustomer.setUpdatedAt(LocalDateTime.now());
 
         log.info("CustomerService: PatchCustomerById patchedCustomer: {}", existingCustomer);
+
+        return Optional.of(existingCustomer);
     }
 }
