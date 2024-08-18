@@ -8,15 +8,15 @@ import java.util.UUID;
 
 public interface BeerService {
 
-    Optional<BeerDTO> getBeerById(UUID uuid);
+    Optional<BeerDTO> getBeerById(UUID beerId);
 
     List<BeerDTO> getAllBeers();
 
     BeerDTO saveBeer(BeerDTO beer);
 
-    void updateBeerById(UUID beerId, BeerDTO beer);
+    Optional<BeerDTO> updateBeerById(UUID beerId, BeerDTO beer);
 
-    void deleteBeerById(UUID beerId);
+    boolean deleteBeerById(UUID beerId);
 
-    void patchBeerById(UUID beerId, BeerDTO beer);
+    Optional<BeerDTO> patchBeerById(UUID beerId, BeerDTO beer);
 }

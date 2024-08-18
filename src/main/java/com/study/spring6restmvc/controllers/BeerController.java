@@ -59,7 +59,9 @@ public class BeerController {
     public ResponseEntity<BeerDTO> updateBeerById(@PathVariable("id") UUID beerId, @RequestBody BeerDTO beer) {
         log.info("BeerController: updateBeerById({})", beerId);
 
-        beerService.updateBeerById(beerId, beer);
+        if (beerService.updateBeerById(beerId, beer).isEmpty()) {
+            throw new NotFoundException();
+        }
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -68,7 +70,9 @@ public class BeerController {
     public ResponseEntity<BeerDTO> deleteBeerById(@PathVariable("id") UUID beerId) {
         log.info("BeerController: deleteBeerById({})", beerId);
 
-        beerService.deleteBeerById(beerId);
+        if (!beerService.deleteBeerById(beerId)) {
+            throw new NotFoundException();
+        }
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -77,7 +81,9 @@ public class BeerController {
     public ResponseEntity<BeerDTO> patchBeerById(@PathVariable("id") UUID beerId, @RequestBody BeerDTO beer) {
         log.info("BeerController: patchBeerById({})", beerId);
 
-        beerService.patchBeerById(beerId, beer);
+        if (beerService.patchBeerById(beerId, beer).isEmpty()) {
+            throw new NotFoundException();
+        }
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
