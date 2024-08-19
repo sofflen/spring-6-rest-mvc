@@ -1,7 +1,7 @@
 package com.study.spring6restmvc.controllers;
 
 import com.study.spring6restmvc.exceptions.NotFoundException;
-import com.study.spring6restmvc.model.Beer;
+import com.study.spring6restmvc.model.BeerDTO;
 import com.study.spring6restmvc.services.BeerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,23 +31,23 @@ public class BeerController {
     public static final String BEER_PATH_ID = "/api/v1/beer/{id}";
 
     @GetMapping(BEER_PATH)
-    public List<Beer> getAllBeers() {
+    public List<BeerDTO> getAllBeers() {
         log.info("BeerController: getAllBeers()");
         return beerService.getAllBeers();
     }
 
     @GetMapping(BEER_PATH_ID)
-    public Beer getBeerById(@PathVariable("id") UUID beerId) {
+    public BeerDTO getBeerById(@PathVariable("id") UUID beerId) {
         log.info("BeerController: getBeerById({})", beerId);
 
         return beerService.getBeerById(beerId).orElseThrow(NotFoundException::new);
     }
 
     @PostMapping(BEER_PATH)
-    public ResponseEntity<Beer> createBeer(@RequestBody Beer beer) {
+    public ResponseEntity<BeerDTO> createBeer(@RequestBody BeerDTO beer) {
         log.info("BeerController: createBeer({})", beer);
 
-        Beer savedBeer = beerService.saveBeer(beer);
+        BeerDTO savedBeer = beerService.saveBeer(beer);
         HttpHeaders headers = new HttpHeaders();
 
         headers.add("Location", BEER_PATH + "/" + savedBeer.getId());
@@ -56,28 +56,34 @@ public class BeerController {
     }
 
     @PutMapping(BEER_PATH_ID)
-    public ResponseEntity<Beer> updateBeerById(@PathVariable("id") UUID beerId, @RequestBody Beer beer) {
+    public ResponseEntity<BeerDTO> updateBeerById(@PathVariable("id") UUID beerId, @RequestBody BeerDTO beer) {
         log.info("BeerController: updateBeerById({})", beerId);
 
-        beerService.updateBeerById(beerId, beer);
+        if (beerService.updateBeerById(beerId, beer).isEmpty()) {
+            throw new NotFoundException();
+        }
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping(BEER_PATH_ID)
-    public ResponseEntity<Beer> deleteBeerById(@PathVariable("id") UUID beerId) {
+    public ResponseEntity<BeerDTO> deleteBeerById(@PathVariable("id") UUID beerId) {
         log.info("BeerController: deleteBeerById({})", beerId);
 
-        beerService.deleteBeerById(beerId);
+        if (!beerService.deleteBeerById(beerId)) {
+            throw new NotFoundException();
+        }
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping(BEER_PATH_ID)
-    public ResponseEntity<Beer> patchBeerById(@PathVariable("id") UUID beerId, @RequestBody Beer beer) {
+    public ResponseEntity<BeerDTO> patchBeerById(@PathVariable("id") UUID beerId, @RequestBody BeerDTO beer) {
         log.info("BeerController: patchBeerById({})", beerId);
 
-        beerService.patchBeerById(beerId, beer);
+        if (beerService.patchBeerById(beerId, beer).isEmpty()) {
+            throw new NotFoundException();
+        }
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
