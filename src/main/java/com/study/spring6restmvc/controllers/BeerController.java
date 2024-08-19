@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -44,7 +45,7 @@ public class BeerController {
     }
 
     @PostMapping(BEER_PATH)
-    public ResponseEntity<BeerDTO> createBeer(@RequestBody BeerDTO beer) {
+    public ResponseEntity<BeerDTO> createBeer(@Validated @RequestBody BeerDTO beer) {
         log.info("BeerController: createBeer({})", beer);
 
         BeerDTO savedBeer = beerService.saveBeer(beer);
@@ -56,7 +57,7 @@ public class BeerController {
     }
 
     @PutMapping(BEER_PATH_ID)
-    public ResponseEntity<BeerDTO> updateBeerById(@PathVariable("id") UUID beerId, @RequestBody BeerDTO beer) {
+    public ResponseEntity<BeerDTO> updateBeerById(@PathVariable("id") UUID beerId,@Validated @RequestBody BeerDTO beer) {
         log.info("BeerController: updateBeerById({})", beerId);
 
         if (beerService.updateBeerById(beerId, beer).isEmpty()) {
