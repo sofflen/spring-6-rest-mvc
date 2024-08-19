@@ -6,6 +6,7 @@ import com.study.spring6restmvc.repositories.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,7 +50,8 @@ public class CustomerServiceJPA implements CustomerService {
 
         customerRepository.findById(customerId).ifPresentOrElse(
                 foundCustomer -> {
-                    foundCustomer.setCustomerName(customer.getCustomerName());
+                    if (StringUtils.hasText(customer.getCustomerName()))
+                        foundCustomer.setCustomerName(customer.getCustomerName());
                     foundCustomer.setUpdatedAt(LocalDateTime.now());
 
                     atomicReference.set(

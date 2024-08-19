@@ -7,11 +7,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @Primary
@@ -80,17 +83,18 @@ public class BeerServiceJPA implements BeerService {
 
         beerRepository.findById(beerId).ifPresentOrElse(
                 foundBeer -> {
-                    if (foundBeer.getBeerName() != null)
+                    if (hasText(beer.getBeerName()))
                         foundBeer.setBeerName(beer.getBeerName());
-                    if (foundBeer.getBeerStyle() != null)
+                    if (beer.getBeerStyle() != null)
                         foundBeer.setBeerStyle(beer.getBeerStyle());
-                    if (foundBeer.getUpc() != null)
+                    if (hasText(beer.getUpc()))
                         foundBeer.setUpc(beer.getUpc());
-                    if (foundBeer.getPrice() != null)
+                    if (beer.getPrice() != null
+                            && beer.getPrice().compareTo(new BigDecimal("0.00")) > 0)
                         foundBeer.setPrice(beer.getPrice());
-                    if (foundBeer.getQuantityOnHand() != null)
+                    if (beer.getQuantityOnHand() != null)
                         foundBeer.setQuantityOnHand(beer.getQuantityOnHand());
-                    if (foundBeer.getUpdatedAt() != null)
+                    if (beer.getUpdatedAt() != null)
                         foundBeer.setUpdatedAt(LocalDateTime.now());
 
                     atomicReference.set(

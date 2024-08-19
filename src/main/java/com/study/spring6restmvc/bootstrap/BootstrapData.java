@@ -48,8 +48,6 @@ public class BootstrapData implements CommandLineRunner {
                     .updatedAt(LocalDateTime.now())
                     .build();
             Beer beer3 = Beer.builder()
-                    .id(UUID.randomUUID())
-                    .version(1)
                     .beerName("Sunshine City")
                     .beerStyle(BeerStyle.IPA)
                     .upc("12356")
