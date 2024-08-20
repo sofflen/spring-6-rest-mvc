@@ -150,7 +150,7 @@ class BeerControllerTest {
         testBeer = BeerDTO.builder().build();
         given(beerService.saveBeer(any(BeerDTO.class))).willReturn(testBeer);
 
-        var mvcResult = mockMvc.perform(post(BEER_PATH)
+        mockMvc.perform(post(BEER_PATH)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testBeer)))

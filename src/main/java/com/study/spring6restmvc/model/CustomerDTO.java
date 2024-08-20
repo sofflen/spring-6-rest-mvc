@@ -1,5 +1,7 @@
 package com.study.spring6restmvc.model;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,5 +15,7 @@ public class CustomerDTO {
     private Integer version;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    @NotBlank
+    @Size(max = 50)
     private String customerName;
 }

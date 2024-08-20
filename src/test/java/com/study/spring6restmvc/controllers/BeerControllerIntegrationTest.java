@@ -103,21 +103,6 @@ class BeerControllerIntegrationTest {
     }
 
     @Test
-    void testPatchBeerByIdWithTooLongNameReturnsBadRequest() throws Exception {
-        var jsonMap = new HashMap<String, String>();
-        String tooLongName = "Beer Name 012345678901234567890123456789012345678901234567890123456789012345678901234567890";
-        jsonMap.put("beerName", tooLongName);
-
-
-        mockMvc.perform(patch(BEER_PATH_ID, testBeer.getId())
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(jsonMap)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.length()", is(1)));
-    }
-
-    @Test
     void testUpdateBeerThrowsNotFoundExceptionIfBeerDoesNotExist() {
         assertThrows(NotFoundException.class,
                 () -> beerController.updateBeerById(UUID.randomUUID(), BeerDTO.builder().build()));
@@ -178,5 +163,20 @@ class BeerControllerIntegrationTest {
         var updatedBeer = beerRepository.findById(testBeer.getId()).orElseThrow();
 
         assertThat(updatedBeer.getBeerName()).isEqualTo(newBeerName);
+    }
+
+    @Test
+    void testPatchBeerByIdWithTooLongNameReturnsBadRequest() throws Exception {
+        var jsonMap = new HashMap<String, String>();
+        String tooLongName = "Beer Name 012345678901234567890123456789012345678901234567890123456789012345678901234567890";
+        jsonMap.put("beerName", tooLongName);
+
+
+        mockMvc.perform(patch(BEER_PATH_ID, testBeer.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(jsonMap)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(1)));
     }
 }

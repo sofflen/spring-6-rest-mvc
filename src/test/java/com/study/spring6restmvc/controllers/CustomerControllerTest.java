@@ -113,8 +113,23 @@ class CustomerControllerTest {
     }
 
     @Test
+    void updateCustomerByIdWithBlankNameReturnsBadRequest() throws Exception {
+        testCustomer.setCustomerName("");
+        given(customerService.updateCustomerById(any(UUID.class), any(CustomerDTO.class))).willReturn(Optional.of(testCustomer));
+
+        mockMvc.perform(put(CUSTOMER_PATH_ID, testCustomer.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testCustomer)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(1)));
+    }
+
+    @Test
     void createCustomer() throws Exception {
-        CustomerDTO customer = CustomerDTO.builder().build();
+        CustomerDTO customer = CustomerDTO.builder()
+                .customerName("Customer Name")
+                .build();
 
         given(customerService.saveCustomer(any(CustomerDTO.class))).willReturn(testCustomer);
 
@@ -125,6 +140,20 @@ class CustomerControllerTest {
                 .andExpectAll(status().isCreated(),
                         header().exists("Location"),
                         redirectedUrlTemplate(CUSTOMER_PATH_ID, testCustomer.getId()));
+    }
+
+    @Test
+    void createCustomerWithNullNameReturnsBadRequest() throws Exception {
+        testCustomer = CustomerDTO.builder().build();
+        given(customerService.saveCustomer(any(CustomerDTO.class))).willReturn(testCustomer);
+
+        mockMvc.perform(post(CUSTOMER_PATH)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testCustomer)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andReturn();
     }
 
     @Test

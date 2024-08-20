@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -45,7 +46,7 @@ public class CustomerController {
     }
 
     @PostMapping(CUSTOMER_PATH)
-    public ResponseEntity<CustomerDTO> createCustomer(@RequestBody CustomerDTO customer) {
+    public ResponseEntity<CustomerDTO> createCustomer(@Validated @RequestBody CustomerDTO customer) {
         log.info("CustomerController: createCustomer({})", customer);
 
         CustomerDTO savedCustomer = customerService.saveCustomer(customer);
@@ -58,7 +59,7 @@ public class CustomerController {
 
     @PutMapping(CUSTOMER_PATH_ID)
     public ResponseEntity<CustomerDTO> updateCustomerById(@PathVariable("id") UUID id,
-                                                          @RequestBody CustomerDTO customer) {
+                                                          @Validated @RequestBody CustomerDTO customer) {
         log.info("CustomerController: updateCustomerById({})", id);
 
         if (customerService.updateCustomerById(id, customer).isEmpty()) {
