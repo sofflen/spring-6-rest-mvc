@@ -1,5 +1,6 @@
 package com.study.spring6restmvc.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.entities.Beer;
 import com.study.spring6restmvc.exceptions.NotFoundException;
 import com.study.spring6restmvc.mappers.BeerMapper;
@@ -10,12 +11,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
+import java.util.HashMap;
 import java.util.UUID;
 
+import static com.study.spring6restmvc.controllers.BeerController.BEER_PATH_ID;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 class BeerControllerIntegrationTest {
@@ -26,12 +37,18 @@ class BeerControllerIntegrationTest {
     private BeerRepository beerRepository;
     @Autowired
     private BeerMapper beerMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private WebApplicationContext wac;
 
     private Beer testBeer;
+    private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         testBeer = beerRepository.findAll().getFirst();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
     @Test
@@ -146,5 +163,20 @@ class BeerControllerIntegrationTest {
         var updatedBeer = beerRepository.findById(testBeer.getId()).orElseThrow();
 
         assertThat(updatedBeer.getBeerName()).isEqualTo(newBeerName);
+    }
+
+    @Test
+    void testPatchBeerByIdWithTooLongNameReturnsBadRequest() throws Exception {
+        var jsonMap = new HashMap<String, String>();
+        String tooLongName = "Beer Name 012345678901234567890123456789012345678901234567890123456789012345678901234567890";
+        jsonMap.put("beerName", tooLongName);
+
+
+        mockMvc.perform(patch(BEER_PATH_ID, testBeer.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(jsonMap)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(1)));
     }
 }

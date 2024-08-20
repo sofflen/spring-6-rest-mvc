@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,5 +31,8 @@ public class Customer {
     private Integer version;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    @NotBlank
+    @Size(max = 50)
+    @Column(length = 50)
     private String customerName;
 }

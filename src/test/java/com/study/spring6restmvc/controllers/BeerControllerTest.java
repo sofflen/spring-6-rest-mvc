@@ -2,6 +2,7 @@ package com.study.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.model.BeerDTO;
+import com.study.spring6restmvc.model.BeerStyle;
 import com.study.spring6restmvc.services.BeerService;
 import com.study.spring6restmvc.services.BeerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -111,8 +113,26 @@ class BeerControllerTest {
     }
 
     @Test
+    void updateBeerByIdWithBlankNameReturnsBadRequest() throws Exception {
+        testBeer.setBeerName("");
+        given(beerService.updateBeerById(any(UUID.class), any(BeerDTO.class))).willReturn(Optional.of(testBeer));
+
+        mockMvc.perform(put(BEER_PATH_ID, testBeer.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testBeer)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(1)));
+    }
+
+    @Test
     void createBeer() throws Exception {
-        BeerDTO beer = BeerDTO.builder().build();
+        BeerDTO beer = BeerDTO.builder()
+                .beerName("Beer Name")
+                .beerStyle(BeerStyle.PALE_ALE)
+                .upc("123")
+                .price(new BigDecimal("11.11"))
+                .build();
 
         given(beerService.saveBeer(any(BeerDTO.class))).willReturn(testBeer);
 
@@ -123,6 +143,20 @@ class BeerControllerTest {
                 .andExpectAll(status().isCreated(),
                         header().exists("Location"),
                         redirectedUrlTemplate(BEER_PATH_ID, testBeer.getId()));
+    }
+
+    @Test
+    void createBeerWithNullNameReturnsBadRequest() throws Exception {
+        testBeer = BeerDTO.builder().build();
+        given(beerService.saveBeer(any(BeerDTO.class))).willReturn(testBeer);
+
+        mockMvc.perform(post(BEER_PATH)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testBeer)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(4)))
+                .andReturn();
     }
 
     @Test

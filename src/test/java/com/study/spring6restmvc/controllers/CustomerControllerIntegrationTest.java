@@ -1,5 +1,6 @@
 package com.study.spring6restmvc.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.entities.Customer;
 import com.study.spring6restmvc.exceptions.NotFoundException;
 import com.study.spring6restmvc.mappers.CustomerMapper;
@@ -10,12 +11,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
+import java.util.HashMap;
 import java.util.UUID;
 
+import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_PATH_ID;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 class CustomerControllerIntegrationTest {
@@ -26,12 +37,18 @@ class CustomerControllerIntegrationTest {
     private CustomerRepository customerRepository;
     @Autowired
     private CustomerMapper customerMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private WebApplicationContext wac;
 
     private Customer testCustomer;
+    private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         testCustomer = customerRepository.findAll().getFirst();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
     @Test
@@ -146,5 +163,20 @@ class CustomerControllerIntegrationTest {
         var updatedCustomer = customerRepository.findById(testCustomer.getId()).orElseThrow();
 
         assertThat(updatedCustomer.getCustomerName()).isEqualTo(newCustomerName);
+    }
+
+    @Test
+    void testPatchCustomerByIdWithTooLongNameReturnsBadRequest() throws Exception {
+        var jsonMap = new HashMap<String, String>();
+        String tooLongName = "Customer Name 012345678901234567890123456789012345678901234567890123456789012345678901234567890";
+        jsonMap.put("customerName", tooLongName);
+
+
+        mockMvc.perform(patch(CUSTOMER_PATH_ID, testCustomer.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(jsonMap)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.length()", is(1)));
     }
 }
