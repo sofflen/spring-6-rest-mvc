@@ -20,10 +20,13 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static com.study.spring6restmvc.controllers.BeerController.BEER_PATH;
 import static com.study.spring6restmvc.controllers.BeerController.BEER_PATH_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -53,7 +56,7 @@ class BeerControllerIntegrationTest {
 
     @Test
     void testGetAllBeers() {
-        var beerDtoList = beerController.getAllBeers();
+        var beerDtoList = beerController.getAllBeers(null, null);
 
         assertThat(beerDtoList).isNotNull();
         assertThat(beerDtoList.size()).isEqualTo(2413);
@@ -64,10 +67,35 @@ class BeerControllerIntegrationTest {
     void testGetAllBeersReturnsEmptyListIfNoBeers() {
         beerRepository.deleteAll();
 
-        var beerDtoList = beerController.getAllBeers();
+        var beerDtoList = beerController.getAllBeers(null, null);
 
         assertThat(beerDtoList).isNotNull();
         assertThat(beerDtoList.isEmpty()).isTrue();
+    }
+
+    @Test
+    void testGetAllBeersWithQueryParamBeerName() throws Exception {
+        mockMvc.perform(get(BEER_PATH)
+                        .queryParam("beerName", "IPA"))
+                .andExpectAll(status().isOk(),
+                        jsonPath("$.size()", greaterThan(300)));
+    }
+
+    @Test
+    void testGetAllBeersWithQueryParamBeerStyle() throws Exception {
+        mockMvc.perform(get(BEER_PATH)
+                        .queryParam("beerStyle", "IPA"))
+                .andExpectAll(status().isOk(),
+                        jsonPath("$.size()", greaterThan(10)));
+    }
+
+    @Test
+    void testGetAllBeersWithQueryParamBeerNameAndBeerStyle() throws Exception {
+        mockMvc.perform(get(BEER_PATH)
+                        .queryParam("beerName", "India")
+                        .queryParam("beerStyle", "IPA"))
+                .andExpectAll(status().isOk(),
+                        jsonPath("$.size()", greaterThan(40)));
     }
 
     @Test
