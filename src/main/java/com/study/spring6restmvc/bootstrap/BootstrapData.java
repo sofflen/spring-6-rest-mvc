@@ -16,7 +16,7 @@ import org.springframework.util.ResourceUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.security.SecureRandom;
 import java.util.List;
 
 @Component
@@ -43,8 +43,6 @@ public class BootstrapData implements CommandLineRunner {
                     .upc("12356")
                     .price(new BigDecimal("12.99"))
                     .quantityOnHand(122)
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
                     .build();
             Beer beer2 = Beer.builder()
                     .beerName("Crank")
@@ -52,8 +50,6 @@ public class BootstrapData implements CommandLineRunner {
                     .upc("12356222")
                     .price(new BigDecimal("11.99"))
                     .quantityOnHand(392)
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
                     .build();
             Beer beer3 = Beer.builder()
                     .beerName("Sunshine City")
@@ -61,8 +57,6 @@ public class BootstrapData implements CommandLineRunner {
                     .upc("12356")
                     .price(new BigDecimal("13.99"))
                     .quantityOnHand(144)
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
                     .build();
 
             beerRepository.saveAll(List.of(beer1, beer2, beer3));
@@ -73,18 +67,12 @@ public class BootstrapData implements CommandLineRunner {
         if (customerRepository.count() == 0) {
             Customer customer1 = Customer.builder()
                     .customerName("John Doe")
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
                     .build();
             Customer customer2 = Customer.builder()
                     .customerName("Jane Doe")
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
                     .build();
             Customer customer3 = Customer.builder()
                     .customerName("Thomas Doe")
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
                     .build();
 
             customerRepository.saveAll(List.of(customer1, customer2, customer3));
@@ -112,13 +100,12 @@ public class BootstrapData implements CommandLineRunner {
                 };
 
                 beerRepository.save(Beer.builder()
-                                .beerName(StringUtils.abbreviate(beerCSVRecord.getBeer(), 50))
-                                .beerStyle(beerStyle)
-                                .upc(beerCSVRecord.getId().toString())
-                                .price(BigDecimal.TEN)
-                                .quantityOnHand(beerCSVRecord.getQuantity())
+                        .beerName(StringUtils.abbreviate(beerCSVRecord.getBeer(), 50))
+                        .beerStyle(beerStyle)
+                        .upc(beerCSVRecord.getId().toString())
+                        .price(BigDecimal.valueOf(new SecureRandom().nextDouble(8.0, 18.0)))
+                        .quantityOnHand(beerCSVRecord.getQuantity())
                         .build());
-
             });
         }
     }
