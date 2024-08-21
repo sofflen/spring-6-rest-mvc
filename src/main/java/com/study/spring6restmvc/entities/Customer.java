@@ -35,4 +35,5 @@ public class Customer {
     @Size(max = 50)
     @Column(length = 50)
     private String customerName;
+    private String email;
 }
