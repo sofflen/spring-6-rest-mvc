@@ -31,7 +31,7 @@ import java.util.UUID;
 public class Beer {
     @Id
     @UuidGenerator
-    @Column(columnDefinition = "varchar(36)", length = 36, updatable = false, nullable = false)
+    @Column(columnDefinition = "UUID", length = 36, updatable = false, nullable = false)
     private UUID id;
     @Version
     private Integer version;
