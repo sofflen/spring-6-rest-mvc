@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 public class BeerCsvServiceImpl implements BeerCsvService {
     @Override
-    public List<BeerCSVRecord> convertCSV(File csvFile) {
+    public List<BeerCSVRecord> convertCSVToList(File csvFile) {
         try {
             return new CsvToBeanBuilder<BeerCSVRecord>(new FileReader(csvFile))
                     .withType(BeerCSVRecord.class)

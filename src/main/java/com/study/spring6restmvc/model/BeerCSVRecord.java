@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 public class BeerCSVRecord {
     @CsvBindByName
     private Integer row;
-    @CsvBindByName(column = "count.x")
-    private Integer count;
     @CsvBindByName
     private String abv;
     @CsvBindByName
@@ -29,8 +27,8 @@ public class BeerCSVRecord {
     private Float ounces;
     @CsvBindByName
     private String style2;
-    @CsvBindByName(column = "count.y")
-    private String countY;
+    @CsvBindByName(column = "count")
+    private Integer quantity;
     @CsvBindByName
     private String city;
     @CsvBindByName
