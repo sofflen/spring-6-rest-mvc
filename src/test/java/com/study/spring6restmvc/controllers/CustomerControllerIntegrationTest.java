@@ -56,7 +56,7 @@ class CustomerControllerIntegrationTest {
         var customerList = customerController.getAllCustomers();
 
         assertThat(customerList).isNotNull();
-        assertThat(customerList.size()).isEqualTo(3);
+        assertThat(customerList.size()).isEqualTo(2003);
     }
 
     @Test

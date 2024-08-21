@@ -3,7 +3,8 @@ package com.study.spring6restmvc.repositories;
 import com.study.spring6restmvc.bootstrap.BootstrapData;
 import com.study.spring6restmvc.entities.Beer;
 import com.study.spring6restmvc.model.BeerStyle;
-import com.study.spring6restmvc.services.BeerCsvServiceImpl;
+import com.study.spring6restmvc.services.BeerCsvService;
+import com.study.spring6restmvc.services.CustomerCsvService;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
-@Import({BootstrapData.class, BeerCsvServiceImpl.class})
+@Import({BootstrapData.class, BeerCsvService.class, CustomerCsvService.class})
 class BeerRepositoryTest {
 
     @Autowired
