@@ -9,14 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,9 +25,10 @@ public class CustomerController {
     public static final String CUSTOMER_PATH_ID = "/api/v1/customer/{id}";
 
     @GetMapping(CUSTOMER_PATH)
-    public List<CustomerDTO> getAllCustomers() {
+    public List<CustomerDTO> getAllCustomers(@RequestParam(required = false) String customerName,
+                                             @RequestParam(required = false) String email) {
         log.info("CustomerController: getAllCustomers()");
-        return customerService.getAllCustomers();
+        return customerService.getAllCustomers(customerName, email);
     }
 
     @GetMapping(CUSTOMER_PATH_ID)

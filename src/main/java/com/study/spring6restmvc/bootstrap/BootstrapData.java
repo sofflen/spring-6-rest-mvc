@@ -71,12 +71,15 @@ public class BootstrapData implements CommandLineRunner {
         if (customerRepository.count() == 0) {
             Customer customer1 = Customer.builder()
                     .customerName("John Doe")
+                    .email("john.doe@gmail.com")
                     .build();
             Customer customer2 = Customer.builder()
                     .customerName("Jane Doe")
+                    .email("jane.doe@gmail.com")
                     .build();
             Customer customer3 = Customer.builder()
                     .customerName("Thomas Doe")
+                    .email("thomas.doe@gmail.com")
                     .build();
 
             customerRepository.saveAll(List.of(customer1, customer2, customer3));

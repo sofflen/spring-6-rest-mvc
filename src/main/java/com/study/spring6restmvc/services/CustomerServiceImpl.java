@@ -54,7 +54,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerDTO> getAllCustomers() {
+    public List<CustomerDTO> getAllCustomers(String customerName, String email) {
         log.info("CustomerService: GetAllCustomers()");
 
         return new ArrayList<>(customersMap.values());
