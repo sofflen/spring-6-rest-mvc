@@ -56,7 +56,7 @@ class BeerControllerIntegrationTest {
         var beerDtoList = beerController.getAllBeers();
 
         assertThat(beerDtoList).isNotNull();
-        assertThat(beerDtoList.size()).isGreaterThan(0);
+        assertThat(beerDtoList.size()).isEqualTo(2413);
     }
 
     @Test
