@@ -28,7 +28,13 @@ public class CustomerController {
     public List<CustomerDTO> getAllCustomers(@RequestParam(required = false) String customerName,
                                              @RequestParam(required = false) String email) {
         log.info("CustomerController: getAllCustomers()");
-        return customerService.getAllCustomers(customerName, email);
+        var customerList = customerService.getAllCustomers(customerName, email);
+
+        if (customerList.isEmpty()) {
+            throw new NotFoundException();
+        }
+
+        return customerList;
     }
 
     @GetMapping(CUSTOMER_PATH_ID)

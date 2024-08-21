@@ -5,6 +5,7 @@ import com.study.spring6restmvc.entities.Beer;
 import com.study.spring6restmvc.exceptions.NotFoundException;
 import com.study.spring6restmvc.mappers.BeerMapper;
 import com.study.spring6restmvc.model.BeerDTO;
+import com.study.spring6restmvc.model.BeerStyle;
 import com.study.spring6restmvc.repositories.BeerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -96,6 +97,12 @@ class BeerControllerIntegrationTest {
                         .queryParam("beerStyle", "IPA"))
                 .andExpectAll(status().isOk(),
                         jsonPath("$.size()", greaterThan(40)));
+    }
+
+    @Test
+    void testGetAllBeersWithBadQueryParamsThrowsNotFoundException() {
+        assertThrows(NotFoundException.class, () -> beerController
+                .getAllBeers("bad beer name", BeerStyle.IPA));
     }
 
     @Test

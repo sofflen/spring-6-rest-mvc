@@ -29,7 +29,14 @@ public class BeerController {
     public List<BeerDTO> getAllBeers(@RequestParam(required = false) String beerName,
                                      @RequestParam(required = false) BeerStyle beerStyle) {
         log.info("BeerController: getAllBeers()");
-        return beerService.getAllBeers(beerName, beerStyle);
+
+        var beerList = beerService.getAllBeers(beerName, beerStyle);
+
+        if (beerList.isEmpty()) {
+            throw new NotFoundException("Beer not found");
+        }
+
+        return beerList;
     }
 
     @GetMapping(BEER_PATH_ID)

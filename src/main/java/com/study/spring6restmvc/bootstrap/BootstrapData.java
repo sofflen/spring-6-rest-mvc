@@ -123,12 +123,11 @@ public class BootstrapData implements CommandLineRunner {
 
             var csvCustomersList = customerCsvService.convertCSVToList(csvFile);
 
-            csvCustomersList.forEach(customerCsvRecord -> {
-                customerRepository.save(Customer.builder()
-                        .customerName(customerCsvRecord.getName())
-                        .email(customerCsvRecord.getEmail())
-                        .build());
-            });
+            csvCustomersList.forEach(customerCsvRecord -> customerRepository
+                    .save(Customer.builder()
+                            .customerName(customerCsvRecord.getName())
+                            .email(customerCsvRecord.getEmail())
+                            .build()));
         }
     }
 }

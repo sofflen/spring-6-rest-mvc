@@ -99,6 +99,12 @@ class CustomerControllerIntegrationTest {
     }
 
     @Test
+    void testGetAllCustomersWithBadQueryParamsThrowsNotFoundException() {
+        assertThrows(NotFoundException.class, () -> customerController
+                .getAllCustomers("john", "john.doe@bad.email"));
+    }
+
+    @Test
     void getCustomerById() {
         var customer = customerRepository.findAll().getFirst();
         var customerDto = customerController.getCustomerById(customer.getId());
