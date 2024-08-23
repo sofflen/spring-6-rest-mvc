@@ -70,10 +70,10 @@ class BeerControllerIntegrationTest {
     void testGetAllBeersReturnsEmptyListIfNoBeers() {
         beerRepository.deleteAll();
 
-        var beerDtoList = beerController.getAllBeers(null, null, false, 1, 25);
+        var beerDtoPage = beerController.getAllBeers(null, null, false, 1, 25);
 
-        assertThat(beerDtoList).isNotNull();
-        assertThat(beerDtoList.isEmpty()).isTrue();
+        assertThat(beerDtoPage).isNotNull();
+        assertThat(beerDtoPage.isEmpty()).isTrue();
     }
 
     @Test

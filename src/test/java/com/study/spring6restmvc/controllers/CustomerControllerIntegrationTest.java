@@ -56,10 +56,10 @@ class CustomerControllerIntegrationTest {
 
     @Test
     void testGetAllCustomers() {
-        var customerPage = customerController.getAllCustomers(null, null, 1, 2000);
+        var customerDtoPage = customerController.getAllCustomers(null, null, 1, 2000);
 
-        assertThat(customerPage).isNotNull();
-        assertThat(customerPage.getContent().size()).isEqualTo(1000);
+        assertThat(customerDtoPage).isNotNull();
+        assertThat(customerDtoPage.getContent().size()).isEqualTo(1000);
     }
 
     @Test
@@ -67,10 +67,10 @@ class CustomerControllerIntegrationTest {
     void testGetAllCustomersReturnsEmptyListIfNoCustomers() {
         customerRepository.deleteAll();
 
-        var customerList = customerController.getAllCustomers(null, null, 1, 25);
+        var customerDtoPage = customerController.getAllCustomers(null, null, 1, 25);
 
-        assertThat(customerList).isNotNull();
-        assertThat(customerList.isEmpty()).isTrue();
+        assertThat(customerDtoPage).isNotNull();
+        assertThat(customerDtoPage.isEmpty()).isTrue();
     }
 
     @Test
