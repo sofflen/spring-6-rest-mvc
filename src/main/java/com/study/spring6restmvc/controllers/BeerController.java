@@ -32,7 +32,7 @@ public class BeerController {
 
         var beerList = beerService.getAllBeers(beerName, beerStyle);
 
-        if (beerList.isEmpty()) {
+        if (beerList.isEmpty() && (beerName != null || beerStyle != null)) {
             throw new NotFoundException("Beer not found");
         }
 

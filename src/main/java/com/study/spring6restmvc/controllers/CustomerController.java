@@ -30,7 +30,7 @@ public class CustomerController {
         log.info("CustomerController: getAllCustomers()");
         var customerList = customerService.getAllCustomers(customerName, email);
 
-        if (customerList.isEmpty()) {
+        if (customerList.isEmpty() && (customerName != null || email != null)) {
             throw new NotFoundException();
         }
 
