@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,9 +29,6 @@ import static org.springframework.util.StringUtils.hasText;
 @RequiredArgsConstructor
 public class BeerServiceJPA implements BeerService {
 
-    public static final Integer DEFAULT_PAGE_NUMBER = 0;
-    public static final Integer DEFAULT_PAGE_SIZE = 25;
-
     private final BeerRepository beerRepository;
     private final BeerMapper beerMapper;
 
@@ -44,7 +42,7 @@ public class BeerServiceJPA implements BeerService {
     @Override
     public Page<BeerDTO> getAllBeers(String beerName, BeerStyle beerStyle, Boolean showInventory,
                                      Integer pageNumber, Integer pageSize) {
-        PageRequest pageRequest = buildPageRequest(pageNumber, pageSize);
+        PageRequest pageRequest = ServiceUtils.buildPageRequest(pageNumber, pageSize);
         Page<Beer> beerPage;
 
         if (hasText(beerName) && beerStyle != null) {
@@ -142,24 +140,5 @@ public class BeerServiceJPA implements BeerService {
     private Page<Beer> getBeersByNameAndStyle(String beerName, BeerStyle beerStyle, Pageable pageable) {
         return beerRepository.findAllByBeerNameIsLikeIgnoreCaseAndBeerStyle(
                 "%" + beerName + "%", beerStyle, pageable);
-    }
-
-    private PageRequest buildPageRequest(Integer pageNumber, Integer pageSize) {
-        int queryPageNumber;
-        int queryPageSize;
-
-        if (pageNumber == null || pageNumber == 0) {
-            queryPageNumber = DEFAULT_PAGE_NUMBER;
-        } else {
-            queryPageNumber = pageNumber - 1;
-        }
-
-        if (pageSize != null && pageSize > 1000) {
-            queryPageSize = 1000;
-        } else {
-            queryPageSize = Objects.requireNonNullElse(pageSize, DEFAULT_PAGE_SIZE);
-        }
-
-        return PageRequest.of(queryPageNumber, queryPageSize);
     }
 }

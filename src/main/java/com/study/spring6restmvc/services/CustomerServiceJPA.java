@@ -6,6 +6,9 @@ import com.study.spring6restmvc.model.CustomerDTO;
 import com.study.spring6restmvc.repositories.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -33,22 +36,21 @@ public class CustomerServiceJPA implements CustomerService {
     }
 
     @Override
-    public List<CustomerDTO> getAllCustomers(String customerName, String email) {
-        List<Customer> customerList;
+    public Page<CustomerDTO> getAllCustomers(String customerName, String email, Integer pageNumber, Integer pageSize) {
+        PageRequest pageRequest = ServiceUtils.buildPageRequest(pageNumber, pageSize);
+        Page<Customer> customerPage;
 
         if (hasText(customerName) && hasText(email)) {
-            customerList = getCustomersByNameAndEmail(customerName, email);
+            customerPage = getCustomersByNameAndEmail(customerName, email, pageRequest);
         } else if (hasText(customerName)) {
-            customerList = getCustomersByName(customerName);
+            customerPage = getCustomersByName(customerName, pageRequest);
         } else if (hasText(email)) {
-            customerList = getCustomersByEmail(email);
+            customerPage = getCustomersByEmail(email, pageRequest);
         } else {
-            customerList = customerRepository.findAll();
+            customerPage = customerRepository.findAll(pageRequest);
         }
 
-        return customerList.stream()
-                .map(customerMapper::customerToCustomerDTO)
-                .toList();
+        return customerPage.map(customerMapper::customerToCustomerDTO);
     }
 
     @Override
@@ -105,16 +107,17 @@ public class CustomerServiceJPA implements CustomerService {
         return Optional.ofNullable(atomicReference.get());
     }
 
-    private List<Customer> getCustomersByNameAndEmail(String customerName, String email) {
+    private Page<Customer> getCustomersByNameAndEmail(String customerName, String email, Pageable pageable) {
         return customerRepository
-                .findAllByCustomerNameIsLikeIgnoreCaseAndEmail("%" + customerName + "%", email);
+                .findAllByCustomerNameIsLikeIgnoreCaseAndEmail("%" + customerName + "%", email, pageable);
     }
 
-    private List<Customer> getCustomersByName(String customerName) {
-        return customerRepository.findAllByCustomerNameIsLikeIgnoreCase("%" + customerName + "%");
+    private Page<Customer> getCustomersByName(String customerName, Pageable pageable) {
+        return customerRepository
+                .findAllByCustomerNameIsLikeIgnoreCase("%" + customerName + "%", pageable);
     }
 
-    private List<Customer> getCustomersByEmail(String email) {
-        return customerRepository.findAllByEmail(email);
+    private Page<Customer> getCustomersByEmail(String email, Pageable pageable) {
+        return customerRepository.findAllByEmail(email, pageable);
     }
 }

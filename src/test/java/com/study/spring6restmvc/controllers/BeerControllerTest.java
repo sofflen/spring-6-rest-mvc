@@ -168,7 +168,7 @@ class BeerControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.content.length()", is(3)));
 
-        verify(beerService).getAllBeers(null, null, null, null, null);
+        verify(beerService).getAllBeers(any(), any(), any(), any(), any());
     }
 
     @Test

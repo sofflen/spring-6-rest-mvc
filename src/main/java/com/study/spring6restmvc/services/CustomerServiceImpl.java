@@ -2,12 +2,13 @@ package com.study.spring6restmvc.services;
 
 import com.study.spring6restmvc.model.CustomerDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,10 +55,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerDTO> getAllCustomers(String customerName, String email) {
+    public Page<CustomerDTO> getAllCustomers(String customerName, String email, Integer pageNumber, Integer pageSize) {
         log.info("CustomerService: GetAllCustomers()");
 
-        return new ArrayList<>(customersMap.values());
+        return new PageImpl<>(new ArrayList<>(customersMap.values()));
     }
 
     @Override

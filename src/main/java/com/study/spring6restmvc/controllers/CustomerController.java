@@ -5,13 +5,13 @@ import com.study.spring6restmvc.model.CustomerDTO;
 import com.study.spring6restmvc.services.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -25,16 +25,16 @@ public class CustomerController {
     public static final String CUSTOMER_PATH_ID = "/api/v1/customer/{id}";
 
     @GetMapping(CUSTOMER_PATH)
-    public List<CustomerDTO> getAllCustomers(@RequestParam(required = false) String customerName,
-                                             @RequestParam(required = false) String email) {
+    public Page<CustomerDTO> getAllCustomers(@RequestParam(required = false) String customerName,
+                                             @RequestParam(required = false) String email, Integer pageNumber, Integer pageSize) {
         log.info("CustomerController: getAllCustomers()");
-        var customerList = customerService.getAllCustomers(customerName, email);
+        var customerPage = customerService.getAllCustomers(customerName, email, pageNumber, pageSize);
 
-        if (customerList.isEmpty() && (customerName != null || email != null)) {
+        if (customerPage.isEmpty() && (customerName != null || email != null)) {
             throw new NotFoundException();
         }
 
-        return customerList;
+        return customerPage;
     }
 
     @GetMapping(CUSTOMER_PATH_ID)

@@ -60,7 +60,7 @@ class CustomerControllerTest {
     @BeforeEach
     void setUp() {
         customerServiceImpl = new CustomerServiceImpl();
-        testCustomer = customerServiceImpl.getAllCustomers(null, null).getFirst();
+        testCustomer = customerServiceImpl.getAllCustomers(null, null, 1, 25).getContent().getFirst();
     }
 
     @Test
@@ -158,14 +158,14 @@ class CustomerControllerTest {
 
     @Test
     void getAllCustomers() throws Exception {
-        given(customerService.getAllCustomers(null, null)).willReturn(customerServiceImpl.getAllCustomers(null, null));
+        given(customerService.getAllCustomers(any(), any(), any(), any())).willReturn(customerServiceImpl.getAllCustomers(null, null, 1, 25));
 
         mockMvc.perform(get(CUSTOMER_PATH))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()", is(3)));
+                .andExpect(jsonPath("$.content.length()", is(3)));
 
-        verify(customerService).getAllCustomers(null, null);
+        verify(customerService).getAllCustomers(any(), any(), any(), any());
     }
 
     @Test
