@@ -1,8 +1,8 @@
 package com.study.spring6restmvc.services;
 
 import com.study.spring6restmvc.model.CustomerDTO;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -10,7 +10,7 @@ public interface CustomerService {
 
     Optional<CustomerDTO> getCustomerById(UUID customerId);
 
-    List<CustomerDTO> getAllCustomers(String customerName, String email);
+    Page<CustomerDTO> getAllCustomers(String customerName, String email, Integer pageNumber, Integer pageSize);
 
     CustomerDTO saveCustomer(CustomerDTO customer);
 

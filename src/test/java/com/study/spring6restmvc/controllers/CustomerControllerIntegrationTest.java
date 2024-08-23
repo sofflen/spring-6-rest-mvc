@@ -56,10 +56,10 @@ class CustomerControllerIntegrationTest {
 
     @Test
     void testGetAllCustomers() {
-        var customerList = customerController.getAllCustomers(null, null);
+        var customerDtoPage = customerController.getAllCustomers(null, null, 1, 2000);
 
-        assertThat(customerList).isNotNull();
-        assertThat(customerList.size()).isEqualTo(2003);
+        assertThat(customerDtoPage).isNotNull();
+        assertThat(customerDtoPage.getContent().size()).isEqualTo(1000);
     }
 
     @Test
@@ -67,10 +67,10 @@ class CustomerControllerIntegrationTest {
     void testGetAllCustomersReturnsEmptyListIfNoCustomers() {
         customerRepository.deleteAll();
 
-        var customerList = customerController.getAllCustomers(null, null);
+        var customerDtoPage = customerController.getAllCustomers(null, null, 1, 25);
 
-        assertThat(customerList).isNotNull();
-        assertThat(customerList.isEmpty()).isTrue();
+        assertThat(customerDtoPage).isNotNull();
+        assertThat(customerDtoPage.isEmpty()).isTrue();
     }
 
     @Test
@@ -86,7 +86,7 @@ class CustomerControllerIntegrationTest {
         mockMvc.perform(get(CUSTOMER_PATH)
                         .queryParam("email", "john.doe@gmail.com"))
                 .andExpectAll(status().isOk(),
-                        jsonPath("$.size()", is(1)));
+                        jsonPath("$.content.size()", is(1)));
     }
 
     @Test
@@ -95,13 +95,23 @@ class CustomerControllerIntegrationTest {
                         .queryParam("customerName", "john")
                         .queryParam("email", "john.doe@gmail.com"))
                 .andExpectAll(status().isOk(),
-                        jsonPath("$.size()", is(1)));
+                        jsonPath("$.content.size()", is(1)));
+    }
+
+    @Test
+    void testGetAllCustomersWithQueryParamCustomerNamePageTwo() throws Exception {
+        mockMvc.perform(get(CUSTOMER_PATH)
+                        .queryParam("customerName", "jo")
+                        .queryParam("pageNumber", "2")
+                        .queryParam("pageSize", "30"))
+                .andExpectAll(status().isOk(),
+                        jsonPath("$.content.size()", is(30)));
     }
 
     @Test
     void testGetAllCustomersWithBadQueryParamsThrowsNotFoundException() {
         assertThrows(NotFoundException.class, () -> customerController
-                .getAllCustomers("john", "john.doe@bad.email"));
+                .getAllCustomers("john", "john.doe@bad.email", 1, 25));
     }
 
     @Test

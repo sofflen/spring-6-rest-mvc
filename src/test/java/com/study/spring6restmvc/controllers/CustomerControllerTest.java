@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,23 +54,23 @@ class CustomerControllerTest {
     private ArgumentCaptor<CustomerDTO> customerArgumentCaptor;
 
     private CustomerServiceImpl customerServiceImpl;
-    private CustomerDTO testCustomer;
+    private CustomerDTO testCustomerDto;
 
     @BeforeEach
     void setUp() {
         customerServiceImpl = new CustomerServiceImpl();
-        testCustomer = customerServiceImpl.getAllCustomers(null, null).getFirst();
+        testCustomerDto = customerServiceImpl.getAllCustomers(null, null, 1, 25).getContent().getFirst();
     }
 
     @Test
     void patchCustomerById() throws Exception {
-        Map<String, String> jsonMap = new HashMap<>();
+        var jsonMap = new HashMap<String, String>();
         jsonMap.put("customerName", "Customer Name");
 
         given(customerService.patchCustomerById(any(UUID.class), any(CustomerDTO.class)))
-                .willReturn(Optional.of(testCustomer));
+                .willReturn(Optional.of(testCustomerDto));
 
-        mockMvc.perform(patch(CUSTOMER_PATH_ID, testCustomer.getId())
+        mockMvc.perform(patch(CUSTOMER_PATH_ID, testCustomerDto.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(jsonMap)))
@@ -79,7 +78,7 @@ class CustomerControllerTest {
 
         verify(customerService).patchCustomerById(uuidArgumentCaptor.capture(), customerArgumentCaptor.capture());
 
-        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(testCustomer.getId());
+        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(testCustomerDto.getId());
         assertThat(customerArgumentCaptor.getValue().getCustomerName()).isEqualTo(jsonMap.get("customerName"));
     }
 
@@ -87,70 +86,70 @@ class CustomerControllerTest {
     void deleteCustomer() throws Exception {
         given(customerService.deleteCustomerById(any(UUID.class))).willReturn(true);
 
-        mockMvc.perform(delete(CUSTOMER_PATH_ID, testCustomer.getId())
+        mockMvc.perform(delete(CUSTOMER_PATH_ID, testCustomerDto.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         verify(customerService).deleteCustomerById(uuidArgumentCaptor.capture());
 
-        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(testCustomer.getId());
+        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(testCustomerDto.getId());
     }
 
     @Test
     void updateCustomerById() throws Exception {
         given(customerService.updateCustomerById(any(UUID.class), any(CustomerDTO.class)))
-                .willReturn(Optional.of(testCustomer));
+                .willReturn(Optional.of(testCustomerDto));
 
-        mockMvc.perform(put(CUSTOMER_PATH_ID, testCustomer.getId())
+        mockMvc.perform(put(CUSTOMER_PATH_ID, testCustomerDto.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testCustomer)))
+                        .content(objectMapper.writeValueAsString(testCustomerDto)))
                 .andExpect(status().isNoContent());
 
-        verify(customerService).updateCustomerById(uuidArgumentCaptor.capture(), eq(testCustomer));
+        verify(customerService).updateCustomerById(uuidArgumentCaptor.capture(), eq(testCustomerDto));
 
-        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(testCustomer.getId());
+        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(testCustomerDto.getId());
     }
 
     @Test
     void updateCustomerByIdWithBlankNameReturnsBadRequest() throws Exception {
-        testCustomer.setCustomerName("");
-        given(customerService.updateCustomerById(any(UUID.class), any(CustomerDTO.class))).willReturn(Optional.of(testCustomer));
+        testCustomerDto.setCustomerName("");
+        given(customerService.updateCustomerById(any(UUID.class), any(CustomerDTO.class))).willReturn(Optional.of(testCustomerDto));
 
-        mockMvc.perform(put(CUSTOMER_PATH_ID, testCustomer.getId())
+        mockMvc.perform(put(CUSTOMER_PATH_ID, testCustomerDto.getId())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testCustomer)))
+                        .content(objectMapper.writeValueAsString(testCustomerDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.length()", is(1)));
     }
 
     @Test
     void createCustomer() throws Exception {
-        CustomerDTO customer = CustomerDTO.builder()
+        var customerDTO = CustomerDTO.builder()
                 .customerName("Customer Name")
                 .build();
 
-        given(customerService.saveCustomer(any(CustomerDTO.class))).willReturn(testCustomer);
+        given(customerService.saveCustomer(any(CustomerDTO.class))).willReturn(testCustomerDto);
 
         mockMvc.perform(post(CUSTOMER_PATH)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(customer)))
+                        .content(objectMapper.writeValueAsString(customerDTO)))
                 .andExpectAll(status().isCreated(),
                         header().exists("Location"),
-                        redirectedUrlTemplate(CUSTOMER_PATH_ID, testCustomer.getId()));
+                        redirectedUrlTemplate(CUSTOMER_PATH_ID, testCustomerDto.getId()));
     }
 
     @Test
     void createCustomerWithNullNameReturnsBadRequest() throws Exception {
-        testCustomer = CustomerDTO.builder().build();
-        given(customerService.saveCustomer(any(CustomerDTO.class))).willReturn(testCustomer);
+        testCustomerDto = CustomerDTO.builder().build();
+        given(customerService.saveCustomer(any(CustomerDTO.class))).willReturn(testCustomerDto);
 
         mockMvc.perform(post(CUSTOMER_PATH)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testCustomer)))
+                        .content(objectMapper.writeValueAsString(testCustomerDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.length()", is(1)))
                 .andReturn();
@@ -158,21 +157,21 @@ class CustomerControllerTest {
 
     @Test
     void getAllCustomers() throws Exception {
-        given(customerService.getAllCustomers(null, null)).willReturn(customerServiceImpl.getAllCustomers(null, null));
+        given(customerService.getAllCustomers(any(), any(), any(), any())).willReturn(customerServiceImpl.getAllCustomers(null, null, 1, 25));
 
         mockMvc.perform(get(CUSTOMER_PATH))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()", is(3)));
+                .andExpect(jsonPath("$.content.length()", is(3)));
 
-        verify(customerService).getAllCustomers(null, null);
+        verify(customerService).getAllCustomers(any(), any(), any(), any());
     }
 
     @Test
     void getCustomerById_NotFound() throws Exception {
-        Optional<CustomerDTO> optionalCustomer = customerServiceImpl.getCustomerById(UUID.randomUUID());
+        var optionalCustomerDto = customerServiceImpl.getCustomerById(UUID.randomUUID());
 
-        given(customerService.getCustomerById(any(UUID.class))).willReturn(optionalCustomer);
+        given(customerService.getCustomerById(any(UUID.class))).willReturn(optionalCustomerDto);
 
         mockMvc.perform(get(CUSTOMER_PATH_ID, UUID.randomUUID()))
                 .andExpect(status().isNotFound());
@@ -180,15 +179,15 @@ class CustomerControllerTest {
 
     @Test
     void getCustomerById() throws Exception {
-        UUID customerId = testCustomer.getId();
+        var customerDtoId = testCustomerDto.getId();
 
-        given(customerService.getCustomerById(customerId)).willReturn(Optional.of(testCustomer));
+        given(customerService.getCustomerById(customerDtoId)).willReturn(Optional.of(testCustomerDto));
 
-        mockMvc.perform(get(CUSTOMER_PATH_ID, testCustomer.getId())
+        mockMvc.perform(get(CUSTOMER_PATH_ID, testCustomerDto.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(customerId.toString())))
-                .andExpect(jsonPath("$.customerName", is(testCustomer.getCustomerName())));
+                .andExpect(jsonPath("$.id", is(customerDtoId.toString())))
+                .andExpect(jsonPath("$.customerName", is(testCustomerDto.getCustomerName())));
     }
 }

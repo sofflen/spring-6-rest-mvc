@@ -2,7 +2,6 @@ package com.study.spring6restmvc.repositories;
 
 import com.study.spring6restmvc.bootstrap.BootstrapData;
 import com.study.spring6restmvc.entities.Customer;
-import com.study.spring6restmvc.model.BeerStyle;
 import com.study.spring6restmvc.services.BeerCsvService;
 import com.study.spring6restmvc.services.CustomerCsvService;
 import jakarta.validation.ConstraintViolationException;
@@ -48,23 +47,23 @@ class CustomerRepositoryTest {
 
     @Test
     void getCustomersByCustomerNameIsLikeIgnoreCase() {
-        var customerList = customerRepository.findAllByCustomerNameIsLikeIgnoreCase("%john%");
+        var customerPage = customerRepository.findAllByCustomerNameIsLikeIgnoreCase("%john%", null);
 
-        assertThat(customerList.size()).isGreaterThan(10);
+        assertThat(customerPage.getContent().size()).isGreaterThan(10);
     }
 
     @Test
     void getBeersByBeerStyle() {
-        var customerList = customerRepository.findAllByEmail("john.doe@gmail.com");
+        var customerPage = customerRepository.findAllByEmail("john.doe@gmail.com", null);
 
-        assertThat(customerList.size()).isEqualTo(1);
+        assertThat(customerPage.getContent().size()).isEqualTo(1);
     }
 
     @Test
     void getBeersByBeerNameAndBeerStyle() {
-        var customerList = customerRepository
-                .findAllByCustomerNameIsLikeIgnoreCaseAndEmail("%john%", "john.doe@gmail.com");
+        var customerPage = customerRepository
+                .findAllByCustomerNameIsLikeIgnoreCaseAndEmail("%john%", "john.doe@gmail.com", null);
 
-        assertThat(customerList.size()).isEqualTo(1);
+        assertThat(customerPage.getContent().size()).isEqualTo(1);
     }
 }
