@@ -34,7 +34,7 @@ public class BeerServiceJPA implements BeerService {
     }
 
     @Override
-    public List<BeerDTO> getAllBeers(String beerName, BeerStyle beerStyle) {
+    public List<BeerDTO> getAllBeers(String beerName, BeerStyle beerStyle, Boolean showInventory) {
         List<Beer> beerList;
 
         if (hasText(beerName) && beerStyle != null) {
@@ -45,6 +45,10 @@ public class BeerServiceJPA implements BeerService {
             beerList = getBeersByStyle(beerStyle);
         } else {
             beerList = beerRepository.findAll();
+        }
+
+        if (showInventory != null && !showInventory) {
+            beerList.forEach(beer -> beer.setQuantityOnHand(null));
         }
 
         return beerList.stream()

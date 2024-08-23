@@ -11,7 +11,7 @@ public interface BeerService {
 
     Optional<BeerDTO> getBeerById(UUID beerId);
 
-    List<BeerDTO> getAllBeers(String beerName, BeerStyle beerStyle);
+    List<BeerDTO> getAllBeers(String beerName, BeerStyle beerStyle, Boolean showInventory);
 
     BeerDTO saveBeer(BeerDTO beer);
 

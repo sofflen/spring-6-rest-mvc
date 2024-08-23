@@ -25,6 +25,7 @@ import static com.study.spring6restmvc.controllers.BeerController.BEER_PATH;
 import static com.study.spring6restmvc.controllers.BeerController.BEER_PATH_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -57,7 +58,7 @@ class BeerControllerIntegrationTest {
 
     @Test
     void testGetAllBeers() {
-        var beerDtoList = beerController.getAllBeers(null, null);
+        var beerDtoList = beerController.getAllBeers(null, null, false);
 
         assertThat(beerDtoList).isNotNull();
         assertThat(beerDtoList.size()).isEqualTo(2413);
@@ -68,7 +69,7 @@ class BeerControllerIntegrationTest {
     void testGetAllBeersReturnsEmptyListIfNoBeers() {
         beerRepository.deleteAll();
 
-        var beerDtoList = beerController.getAllBeers(null, null);
+        var beerDtoList = beerController.getAllBeers(null, null, false);
 
         assertThat(beerDtoList).isNotNull();
         assertThat(beerDtoList.isEmpty()).isTrue();
@@ -77,7 +78,7 @@ class BeerControllerIntegrationTest {
     @Test
     void testGetAllBeersWithQueryParamBeerName() throws Exception {
         mockMvc.perform(get(BEER_PATH)
-                        .queryParam("beerName", "IPA"))
+                        .queryParam("beerName", BeerStyle.IPA.name()))
                 .andExpectAll(status().isOk(),
                         jsonPath("$.size()", greaterThan(300)));
     }
@@ -85,7 +86,7 @@ class BeerControllerIntegrationTest {
     @Test
     void testGetAllBeersWithQueryParamBeerStyle() throws Exception {
         mockMvc.perform(get(BEER_PATH)
-                        .queryParam("beerStyle", "IPA"))
+                        .queryParam("beerStyle", BeerStyle.IPA.name()))
                 .andExpectAll(status().isOk(),
                         jsonPath("$.size()", greaterThan(10)));
     }
@@ -100,9 +101,20 @@ class BeerControllerIntegrationTest {
     }
 
     @Test
+    void testGetAllBeersWithQueryParamBeerNameAndBeerStyleShowInventory() throws Exception {
+        mockMvc.perform(get(BEER_PATH)
+                        .queryParam("beerName", "IPA")
+                        .queryParam("beerStyle", BeerStyle.IPA.name())
+                        .queryParam("showInventory", "false"))
+                .andExpectAll(status().isOk(),
+                        jsonPath("$.size()", greaterThan(40)),
+                        jsonPath("$.[0].quantityOnHand").value(nullValue()));
+    }
+
+        @Test
     void testGetAllBeersWithBadQueryParamsThrowsNotFoundException() {
         assertThrows(NotFoundException.class, () -> beerController
-                .getAllBeers("bad beer name", BeerStyle.IPA));
+                .getAllBeers("bad beer name", BeerStyle.IPA, false));
     }
 
     @Test

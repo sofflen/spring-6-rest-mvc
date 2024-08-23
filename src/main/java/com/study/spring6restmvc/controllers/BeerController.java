@@ -27,10 +27,11 @@ public class BeerController {
 
     @GetMapping(BEER_PATH)
     public List<BeerDTO> getAllBeers(@RequestParam(required = false) String beerName,
-                                     @RequestParam(required = false) BeerStyle beerStyle) {
+                                     @RequestParam(required = false) BeerStyle beerStyle,
+                                     @RequestParam(required = false) Boolean showInventory) {
         log.info("BeerController: getAllBeers()");
 
-        var beerList = beerService.getAllBeers(beerName, beerStyle);
+        var beerList = beerService.getAllBeers(beerName, beerStyle, showInventory);
 
         if (beerList.isEmpty() && (beerName != null || beerStyle != null)) {
             throw new NotFoundException("Beer not found");
