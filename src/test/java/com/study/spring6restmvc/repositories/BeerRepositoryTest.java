@@ -56,22 +56,22 @@ class BeerRepositoryTest {
 
     @Test
     void getBeersByBeerNameIsLikeIgnoreCase() {
-        var beerList = beerRepository.findAllByBeerNameIsLikeIgnoreCase("%IPA%");
+        var beerPage = beerRepository.findAllByBeerNameIsLikeIgnoreCase("%IPA%", null);
 
-        assertThat(beerList.size()).isGreaterThan(300);
+        assertThat(beerPage.getContent().size()).isGreaterThan(300);
     }
 
     @Test
     void getBeersByBeerStyle() {
-        var beerList = beerRepository.findAllByBeerStyle(BeerStyle.PALE_ALE);
+        var beerPage = beerRepository.findAllByBeerStyle(BeerStyle.PALE_ALE, null);
 
-        assertThat(beerList.size()).isGreaterThan(10);
+        assertThat(beerPage.getContent().size()).isGreaterThan(10);
     }
 
     @Test
     void getBeersByBeerNameAndBeerStyle() {
-        var beerList = beerRepository.findAllByBeerNameIsLikeIgnoreCaseAndBeerStyle("%india%", BeerStyle.IPA);
+        var beerPage = beerRepository.findAllByBeerNameIsLikeIgnoreCaseAndBeerStyle("%india%", BeerStyle.IPA, null);
 
-        assertThat(beerList.size()).isGreaterThan(40);
+        assertThat(beerPage.getContent().size()).isGreaterThan(40);
     }
 }

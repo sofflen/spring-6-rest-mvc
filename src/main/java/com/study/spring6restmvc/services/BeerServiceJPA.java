@@ -7,11 +7,16 @@ import com.study.spring6restmvc.model.BeerStyle;
 import com.study.spring6restmvc.repositories.BeerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -22,6 +27,9 @@ import static org.springframework.util.StringUtils.hasText;
 @Primary
 @RequiredArgsConstructor
 public class BeerServiceJPA implements BeerService {
+
+    public static final Integer DEFAULT_PAGE_NUMBER = 0;
+    public static final Integer DEFAULT_PAGE_SIZE = 25;
 
     private final BeerRepository beerRepository;
     private final BeerMapper beerMapper;
@@ -34,26 +42,26 @@ public class BeerServiceJPA implements BeerService {
     }
 
     @Override
-    public List<BeerDTO> getAllBeers(String beerName, BeerStyle beerStyle, Boolean showInventory) {
-        List<Beer> beerList;
+    public Page<BeerDTO> getAllBeers(String beerName, BeerStyle beerStyle, Boolean showInventory,
+                                     Integer pageNumber, Integer pageSize) {
+        PageRequest pageRequest = buildPageRequest(pageNumber, pageSize);
+        Page<Beer> beerPage;
 
         if (hasText(beerName) && beerStyle != null) {
-            beerList = getBeersByNameAndStyle(beerName, beerStyle);
+            beerPage = getBeersByNameAndStyle(beerName, beerStyle, pageRequest);
         } else if (hasText(beerName)) {
-            beerList = getBeersByName(beerName);
+            beerPage = getBeersByName(beerName, pageRequest);
         } else if (beerStyle != null) {
-            beerList = getBeersByStyle(beerStyle);
+            beerPage = getBeersByStyle(beerStyle, pageRequest);
         } else {
-            beerList = beerRepository.findAll();
+            beerPage = beerRepository.findAll(pageRequest);
         }
 
         if (showInventory != null && !showInventory) {
-            beerList.forEach(beer -> beer.setQuantityOnHand(null));
+            beerPage.forEach(beer -> beer.setQuantityOnHand(null));
         }
 
-        return beerList.stream()
-                .map(beerMapper::beerToBeerDTO)
-                .toList();
+        return beerPage.map(beerMapper::beerToBeerDTO);
     }
 
     @Override
@@ -123,18 +131,35 @@ public class BeerServiceJPA implements BeerService {
         return Optional.ofNullable(atomicReference.get());
     }
 
-    private List<Beer> getBeersByName(String beerName) {
-        return beerRepository.findAllByBeerNameIsLikeIgnoreCase("%" + beerName + "%")
-                .stream().toList();
+    private Page<Beer> getBeersByName(String beerName, Pageable pageable) {
+        return beerRepository.findAllByBeerNameIsLikeIgnoreCase("%" + beerName + "%", pageable);
     }
 
-    private List<Beer> getBeersByStyle(BeerStyle beerStyle) {
-        return beerRepository.findAllByBeerStyle(beerStyle)
-                .stream().toList();
+    private Page<Beer> getBeersByStyle(BeerStyle beerStyle, Pageable pageable) {
+        return beerRepository.findAllByBeerStyle(beerStyle, pageable);
     }
 
-    private List<Beer> getBeersByNameAndStyle(String beerName, BeerStyle beerStyle) {
-        return beerRepository.findAllByBeerNameIsLikeIgnoreCaseAndBeerStyle("%" + beerName + "%", beerStyle)
-                .stream().toList();
+    private Page<Beer> getBeersByNameAndStyle(String beerName, BeerStyle beerStyle, Pageable pageable) {
+        return beerRepository.findAllByBeerNameIsLikeIgnoreCaseAndBeerStyle(
+                "%" + beerName + "%", beerStyle, pageable);
+    }
+
+    private PageRequest buildPageRequest(Integer pageNumber, Integer pageSize) {
+        int queryPageNumber;
+        int queryPageSize;
+
+        if (pageNumber == null || pageNumber == 0) {
+            queryPageNumber = DEFAULT_PAGE_NUMBER;
+        } else {
+            queryPageNumber = pageNumber - 1;
+        }
+
+        if (pageSize != null && pageSize > 1000) {
+            queryPageSize = 1000;
+        } else {
+            queryPageSize = Objects.requireNonNullElse(pageSize, DEFAULT_PAGE_SIZE);
+        }
+
+        return PageRequest.of(queryPageNumber, queryPageSize);
     }
 }

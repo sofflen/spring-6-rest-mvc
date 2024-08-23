@@ -62,7 +62,7 @@ class BeerControllerTest {
     @BeforeEach
     void setUp() {
         beerServiceImpl = new BeerServiceImpl();
-        testBeer = beerServiceImpl.getAllBeers(null, null, false).getFirst();
+        testBeer = beerServiceImpl.getAllBeers(null, null, false, 1, 25).getContent().getFirst();
     }
 
     @Test
@@ -161,14 +161,14 @@ class BeerControllerTest {
 
     @Test
     void getAllBeers() throws Exception {
-        given(beerService.getAllBeers(any(), any(), any())).willReturn(beerServiceImpl.getAllBeers(null, null, false));
+        given(beerService.getAllBeers(any(), any(), any(), any(), any())).willReturn(beerServiceImpl.getAllBeers(null, null, false, 1, 25));
 
         mockMvc.perform(get(BEER_PATH))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()", is(3)));
+                .andExpect(jsonPath("$.content.length()", is(3)));
 
-        verify(beerService).getAllBeers(null, null, null);
+        verify(beerService).getAllBeers(null, null, null, null, null);
     }
 
     @Test
