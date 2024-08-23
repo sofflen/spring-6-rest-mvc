@@ -1,5 +1,6 @@
 package com.study.spring6restmvc.services;
 
+import com.study.spring6restmvc.entities.Customer;
 import com.study.spring6restmvc.mappers.CustomerMapper;
 import com.study.spring6restmvc.model.CustomerDTO;
 import com.study.spring6restmvc.repositories.CustomerRepository;
@@ -13,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static org.springframework.util.StringUtils.hasText;
 
 @Service
 @Primary
@@ -30,9 +33,20 @@ public class CustomerServiceJPA implements CustomerService {
     }
 
     @Override
-    public List<CustomerDTO> getAllCustomers() {
-        return customerRepository.findAll()
-                .stream()
+    public List<CustomerDTO> getAllCustomers(String customerName, String email) {
+        List<Customer> customerList;
+
+        if (hasText(customerName) && hasText(email)) {
+            customerList = getCustomersByNameAndEmail(customerName, email);
+        } else if (hasText(customerName)) {
+            customerList = getCustomersByName(customerName);
+        } else if (hasText(email)) {
+            customerList = getCustomersByEmail(email);
+        } else {
+            customerList = customerRepository.findAll();
+        }
+
+        return customerList.stream()
                 .map(customerMapper::customerToCustomerDTO)
                 .toList();
     }
@@ -89,5 +103,18 @@ public class CustomerServiceJPA implements CustomerService {
                 () -> atomicReference.set(null));
 
         return Optional.ofNullable(atomicReference.get());
+    }
+
+    private List<Customer> getCustomersByNameAndEmail(String customerName, String email) {
+        return customerRepository
+                .findAllByCustomerNameIsLikeIgnoreCaseAndEmail("%" + customerName + "%", email);
+    }
+
+    private List<Customer> getCustomersByName(String customerName) {
+        return customerRepository.findAllByCustomerNameIsLikeIgnoreCase("%" + customerName + "%");
+    }
+
+    private List<Customer> getCustomersByEmail(String email) {
+        return customerRepository.findAllByEmail(email);
     }
 }

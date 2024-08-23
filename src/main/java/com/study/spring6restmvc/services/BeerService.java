@@ -1,6 +1,7 @@
 package com.study.spring6restmvc.services;
 
 import com.study.spring6restmvc.model.BeerDTO;
+import com.study.spring6restmvc.model.BeerStyle;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +11,7 @@ public interface BeerService {
 
     Optional<BeerDTO> getBeerById(UUID beerId);
 
-    List<BeerDTO> getAllBeers();
+    List<BeerDTO> getAllBeers(String beerName, BeerStyle beerStyle);
 
     BeerDTO saveBeer(BeerDTO beer);
 

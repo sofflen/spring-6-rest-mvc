@@ -2,10 +2,12 @@ package com.study.spring6restmvc.bootstrap;
 
 import com.study.spring6restmvc.entities.Beer;
 import com.study.spring6restmvc.entities.Customer;
+import com.study.spring6restmvc.model.BeerCsvRecord;
 import com.study.spring6restmvc.model.BeerStyle;
+import com.study.spring6restmvc.model.CustomerCsvRecord;
 import com.study.spring6restmvc.repositories.BeerRepository;
 import com.study.spring6restmvc.repositories.CustomerRepository;
-import com.study.spring6restmvc.services.BeerCsvService;
+import com.study.spring6restmvc.services.CsvService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.CommandLineRunner;
@@ -25,7 +27,8 @@ public class BootstrapData implements CommandLineRunner {
 
     private final BeerRepository beerRepository;
     private final CustomerRepository customerRepository;
-    private final BeerCsvService beerCsvService;
+    private final CsvService<BeerCsvRecord> beerCsvService;
+    private final CsvService<CustomerCsvRecord> customerCsvService;
 
     @Transactional
     @Override
@@ -33,6 +36,7 @@ public class BootstrapData implements CommandLineRunner {
         loadBeerData();
         loadCustomerData();
         loadBeerCsvData();
+        loadCustomerCsvData();
     }
 
     private void loadBeerData() {
@@ -67,12 +71,15 @@ public class BootstrapData implements CommandLineRunner {
         if (customerRepository.count() == 0) {
             Customer customer1 = Customer.builder()
                     .customerName("John Doe")
+                    .email("john.doe@gmail.com")
                     .build();
             Customer customer2 = Customer.builder()
                     .customerName("Jane Doe")
+                    .email("jane.doe@gmail.com")
                     .build();
             Customer customer3 = Customer.builder()
                     .customerName("Thomas Doe")
+                    .email("thomas.doe@gmail.com")
                     .build();
 
             customerRepository.saveAll(List.of(customer1, customer2, customer3));
@@ -85,8 +92,8 @@ public class BootstrapData implements CommandLineRunner {
 
             var csvBeersList = beerCsvService.convertCSVToList(csvFile);
 
-            csvBeersList.forEach(beerCSVRecord -> {
-                BeerStyle beerStyle = switch (beerCSVRecord.getStyle()) {
+            csvBeersList.forEach(beerCsvRecord -> {
+                BeerStyle beerStyle = switch (beerCsvRecord.getStyle()) {
                     case "American Pale Lager" -> BeerStyle.LAGER;
                     case "American Pale Ale (APA)", "American Black Ale", "Belgian Dark Ale", "American Blonde Ale" ->
                             BeerStyle.ALE;
@@ -100,13 +107,27 @@ public class BootstrapData implements CommandLineRunner {
                 };
 
                 beerRepository.save(Beer.builder()
-                        .beerName(StringUtils.abbreviate(beerCSVRecord.getBeer(), 50))
+                        .beerName(StringUtils.abbreviate(beerCsvRecord.getBeer(), 50))
                         .beerStyle(beerStyle)
-                        .upc(beerCSVRecord.getId().toString())
+                        .upc(beerCsvRecord.getId().toString())
                         .price(BigDecimal.valueOf(new SecureRandom().nextDouble(8.0, 18.0)))
-                        .quantityOnHand(beerCSVRecord.getQuantity())
+                        .quantityOnHand(beerCsvRecord.getQuantity())
                         .build());
             });
+        }
+    }
+
+    private void loadCustomerCsvData() throws FileNotFoundException {
+        if (customerRepository.count() < 10) {
+            File csvFile = ResourceUtils.getFile("classpath:csvdata/customers.csv");
+
+            var csvCustomersList = customerCsvService.convertCSVToList(csvFile);
+
+            csvCustomersList.forEach(customerCsvRecord -> customerRepository
+                    .save(Customer.builder()
+                            .customerName(customerCsvRecord.getName())
+                            .email(customerCsvRecord.getEmail())
+                            .build()));
         }
     }
 }

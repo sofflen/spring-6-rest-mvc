@@ -1,9 +1,12 @@
 package com.study.spring6restmvc.bootstrap;
 
+import com.study.spring6restmvc.model.BeerCsvRecord;
+import com.study.spring6restmvc.model.CustomerCsvRecord;
 import com.study.spring6restmvc.repositories.BeerRepository;
 import com.study.spring6restmvc.repositories.CustomerRepository;
 import com.study.spring6restmvc.services.BeerCsvService;
-import com.study.spring6restmvc.services.BeerCsvServiceImpl;
+import com.study.spring6restmvc.services.CsvService;
+import com.study.spring6restmvc.services.CustomerCsvService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +16,7 @@ import org.springframework.context.annotation.Import;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import(BeerCsvServiceImpl.class)
+@Import({BeerCsvService.class, CustomerCsvService.class})
 class BootstrapDataTest {
 
     @Autowired
@@ -21,13 +24,15 @@ class BootstrapDataTest {
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
-    private BeerCsvService beerCsvService;
+    private CsvService<BeerCsvRecord> beerCsvService;
+    @Autowired
+    CsvService<CustomerCsvRecord> customerCsvService;
 
     private BootstrapData bootstrapData;
 
     @BeforeEach
     void setUp() {
-        bootstrapData = new BootstrapData(beerRepository, customerRepository, beerCsvService);
+        bootstrapData = new BootstrapData(beerRepository, customerRepository, beerCsvService, customerCsvService);
     }
 
     @Test
@@ -35,6 +40,6 @@ class BootstrapDataTest {
         bootstrapData.run(null);
 
         assertThat(beerRepository.count()).isEqualTo(2413);
-        assertThat(customerRepository.count()).isEqualTo(3);
+        assertThat(customerRepository.count()).isEqualTo(2003);
     }
 }

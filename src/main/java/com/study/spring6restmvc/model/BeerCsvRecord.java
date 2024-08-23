@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BeerCSVRecord {
+public class BeerCsvRecord {
     @CsvBindByName
     private Integer row;
     @CsvBindByName

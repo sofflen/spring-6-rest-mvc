@@ -20,10 +20,13 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_PATH;
 import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_PATH_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -53,10 +56,10 @@ class CustomerControllerIntegrationTest {
 
     @Test
     void testGetAllCustomers() {
-        var customerList = customerController.getAllCustomers();
+        var customerList = customerController.getAllCustomers(null, null);
 
         assertThat(customerList).isNotNull();
-        assertThat(customerList.size()).isEqualTo(3);
+        assertThat(customerList.size()).isEqualTo(2003);
     }
 
     @Test
@@ -64,10 +67,41 @@ class CustomerControllerIntegrationTest {
     void testGetAllCustomersReturnsEmptyListIfNoCustomers() {
         customerRepository.deleteAll();
 
-        var customerList = customerController.getAllCustomers();
+        var customerList = customerController.getAllCustomers(null, null);
 
         assertThat(customerList).isNotNull();
         assertThat(customerList.isEmpty()).isTrue();
+    }
+
+    @Test
+    void testGetAllCustomersWithQueryParamCustomerName() throws Exception {
+        mockMvc.perform(get(CUSTOMER_PATH)
+                        .queryParam("customerName", "john"))
+                .andExpectAll(status().isOk(),
+                        jsonPath("$.size()", greaterThan(10)));
+    }
+
+    @Test
+    void testGetAllCustomersWithQueryParamEmail() throws Exception {
+        mockMvc.perform(get(CUSTOMER_PATH)
+                        .queryParam("email", "john.doe@gmail.com"))
+                .andExpectAll(status().isOk(),
+                        jsonPath("$.size()", is(1)));
+    }
+
+    @Test
+    void testGetAllCustomersWithQueryParamCustomerNameAndEmail() throws Exception {
+        mockMvc.perform(get(CUSTOMER_PATH)
+                        .queryParam("customerName", "john")
+                        .queryParam("email", "john.doe@gmail.com"))
+                .andExpectAll(status().isOk(),
+                        jsonPath("$.size()", is(1)));
+    }
+
+    @Test
+    void testGetAllCustomersWithBadQueryParamsThrowsNotFoundException() {
+        assertThrows(NotFoundException.class, () -> customerController
+                .getAllCustomers("john", "john.doe@bad.email"));
     }
 
     @Test

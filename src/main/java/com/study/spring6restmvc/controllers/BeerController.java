@@ -2,6 +2,7 @@ package com.study.spring6restmvc.controllers;
 
 import com.study.spring6restmvc.exceptions.NotFoundException;
 import com.study.spring6restmvc.model.BeerDTO;
+import com.study.spring6restmvc.model.BeerStyle;
 import com.study.spring6restmvc.services.BeerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,14 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,9 +26,17 @@ public class BeerController {
     public static final String BEER_PATH_ID = "/api/v1/beer/{id}";
 
     @GetMapping(BEER_PATH)
-    public List<BeerDTO> getAllBeers() {
+    public List<BeerDTO> getAllBeers(@RequestParam(required = false) String beerName,
+                                     @RequestParam(required = false) BeerStyle beerStyle) {
         log.info("BeerController: getAllBeers()");
-        return beerService.getAllBeers();
+
+        var beerList = beerService.getAllBeers(beerName, beerStyle);
+
+        if (beerList.isEmpty()) {
+            throw new NotFoundException("Beer not found");
+        }
+
+        return beerList;
     }
 
     @GetMapping(BEER_PATH_ID)
@@ -57,7 +59,7 @@ public class BeerController {
     }
 
     @PutMapping(BEER_PATH_ID)
-    public ResponseEntity<BeerDTO> updateBeerById(@PathVariable("id") UUID beerId,@Validated @RequestBody BeerDTO beer) {
+    public ResponseEntity<BeerDTO> updateBeerById(@PathVariable("id") UUID beerId, @Validated @RequestBody BeerDTO beer) {
         log.info("BeerController: updateBeerById({})", beerId);
 
         if (beerService.updateBeerById(beerId, beer).isEmpty()) {

@@ -10,7 +10,7 @@ public interface CustomerService {
 
     Optional<CustomerDTO> getCustomerById(UUID customerId);
 
-    List<CustomerDTO> getAllCustomers();
+    List<CustomerDTO> getAllCustomers(String customerName, String email);
 
     CustomerDTO saveCustomer(CustomerDTO customer);
 

@@ -1,7 +1,9 @@
 package com.study.spring6restmvc.services;
 
+import com.study.spring6restmvc.entities.Beer;
 import com.study.spring6restmvc.mappers.BeerMapper;
 import com.study.spring6restmvc.model.BeerDTO;
+import com.study.spring6restmvc.model.BeerStyle;
 import com.study.spring6restmvc.repositories.BeerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -32,9 +34,20 @@ public class BeerServiceJPA implements BeerService {
     }
 
     @Override
-    public List<BeerDTO> getAllBeers() {
-        return beerRepository.findAll()
-                .stream()
+    public List<BeerDTO> getAllBeers(String beerName, BeerStyle beerStyle) {
+        List<Beer> beerList;
+
+        if (hasText(beerName) && beerStyle != null) {
+            beerList = getBeersByNameAndStyle(beerName, beerStyle);
+        } else if (hasText(beerName)) {
+            beerList = getBeersByName(beerName);
+        } else if (beerStyle != null) {
+            beerList = getBeersByStyle(beerStyle);
+        } else {
+            beerList = beerRepository.findAll();
+        }
+
+        return beerList.stream()
                 .map(beerMapper::beerToBeerDTO)
                 .toList();
     }
@@ -104,5 +117,20 @@ public class BeerServiceJPA implements BeerService {
                 () -> atomicReference.set(null));
 
         return Optional.ofNullable(atomicReference.get());
+    }
+
+    private List<Beer> getBeersByName(String beerName) {
+        return beerRepository.findAllByBeerNameIsLikeIgnoreCase("%" + beerName + "%")
+                .stream().toList();
+    }
+
+    private List<Beer> getBeersByStyle(BeerStyle beerStyle) {
+        return beerRepository.findAllByBeerStyle(beerStyle)
+                .stream().toList();
+    }
+
+    private List<Beer> getBeersByNameAndStyle(String beerName, BeerStyle beerStyle) {
+        return beerRepository.findAllByBeerNameIsLikeIgnoreCaseAndBeerStyle("%" + beerName + "%", beerStyle)
+                .stream().toList();
     }
 }

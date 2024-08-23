@@ -1,11 +1,24 @@
 package com.study.spring6restmvc.services;
 
-import com.study.spring6restmvc.model.BeerCSVRecord;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.study.spring6restmvc.model.BeerCsvRecord;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.List;
 
-public interface BeerCsvService {
-
-    List<BeerCSVRecord> convertCSVToList(File csvFile);
+@Service
+public class BeerCsvService implements CsvService<BeerCsvRecord> {
+    @Override
+    public List<BeerCsvRecord> convertCSVToList(File csvFile) {
+        try {
+            return new CsvToBeanBuilder<BeerCsvRecord>(new FileReader(csvFile))
+                    .withType(BeerCsvRecord.class)
+                    .build().parse();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
