@@ -9,11 +9,11 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -37,7 +37,7 @@ public class CustomerServiceJPA implements CustomerService {
 
     @Override
     public Page<CustomerDTO> getAllCustomers(String customerName, String email, Integer pageNumber, Integer pageSize) {
-        PageRequest pageRequest = ServiceUtils.buildPageRequest(pageNumber, pageSize);
+        PageRequest pageRequest = ServiceUtils.buildPageRequest(pageNumber, pageSize, Sort.by("customerName"));
         Page<Customer> customerPage;
 
         if (hasText(customerName) && hasText(email)) {

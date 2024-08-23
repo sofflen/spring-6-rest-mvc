@@ -1,6 +1,7 @@
 package com.study.spring6restmvc.services;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.Objects;
 
@@ -12,7 +13,7 @@ public class ServiceUtils {
     private ServiceUtils() {
     }
 
-    public static PageRequest buildPageRequest(Integer pageNumber, Integer pageSize) {
+    public static PageRequest buildPageRequest(Integer pageNumber, Integer pageSize, Sort sort) {
         int queryPageNumber;
         int queryPageSize;
 
@@ -28,6 +29,10 @@ public class ServiceUtils {
             queryPageSize = Objects.requireNonNullElse(pageSize, DEFAULT_PAGE_SIZE);
         }
 
-        return PageRequest.of(queryPageNumber, queryPageSize);
+        if (sort == null) {
+            sort = Sort.unsorted();
+        }
+
+        return PageRequest.of(queryPageNumber, queryPageSize, sort);
     }
 }

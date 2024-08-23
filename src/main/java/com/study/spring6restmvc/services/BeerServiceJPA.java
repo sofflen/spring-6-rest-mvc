@@ -8,16 +8,13 @@ import com.study.spring6restmvc.repositories.BeerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -42,7 +39,7 @@ public class BeerServiceJPA implements BeerService {
     @Override
     public Page<BeerDTO> getAllBeers(String beerName, BeerStyle beerStyle, Boolean showInventory,
                                      Integer pageNumber, Integer pageSize) {
-        PageRequest pageRequest = ServiceUtils.buildPageRequest(pageNumber, pageSize);
+        PageRequest pageRequest = ServiceUtils.buildPageRequest(pageNumber, pageSize, Sort.by("beerName"));
         Page<Beer> beerPage;
 
         if (hasText(beerName) && beerStyle != null) {
