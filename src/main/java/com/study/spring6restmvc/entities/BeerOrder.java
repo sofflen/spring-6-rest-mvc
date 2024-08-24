@@ -4,8 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +22,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class Customer {
+public class BeerOrder {
     @Id
     @UuidGenerator
     @Column(columnDefinition = "UUID", length = 36, updatable = false, nullable = false)
@@ -32,13 +30,10 @@ public class Customer {
     @Version
     private Integer version;
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
     @UpdateTimestamp
-    @Column(updatable = false)
     private LocalDateTime updatedAt;
-    @NotBlank
-    @Size(max = 50)
-    @Column(length = 50)
-    private String customerName;
-    private String email;
+    private String customerRef;
+    private UUID customerId;
 }

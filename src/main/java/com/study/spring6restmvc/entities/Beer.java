@@ -36,6 +36,7 @@ public class Beer {
     @Version
     private Integer version;
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
