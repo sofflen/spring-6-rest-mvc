@@ -4,6 +4,7 @@ import com.study.spring6restmvc.model.BeerStyle;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Version;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +21,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -53,4 +55,6 @@ public class Beer {
     @NotNull
     @DecimalMin(value = "0.00", inclusive = false)
     private BigDecimal price;
+    @OneToMany(mappedBy = "beer")
+    private Set<BeerOrderLine> beerOrderLines;
 }

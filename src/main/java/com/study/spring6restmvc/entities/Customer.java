@@ -3,6 +3,7 @@ package com.study.spring6restmvc.entities;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -16,6 +17,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -41,4 +43,6 @@ public class Customer {
     @Column(length = 50)
     private String customerName;
     private String email;
+    @OneToMany(mappedBy = "customer")
+    private Set<BeerOrder> beerOrders;
 }

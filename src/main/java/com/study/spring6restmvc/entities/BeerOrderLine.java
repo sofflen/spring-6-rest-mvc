@@ -3,6 +3,7 @@ package com.study.spring6restmvc.entities;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,6 +37,8 @@ public class BeerOrderLine {
     private LocalDateTime updatedAt;
     private Integer orderQuantity;
     private Integer quantityAllocated;
-    private UUID beerId;
-    private UUID beerOrderId;
+    @ManyToOne
+    private Beer beer;
+    @ManyToOne
+    private BeerOrder beerOrder;
 }
