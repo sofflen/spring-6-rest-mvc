@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,6 +23,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -30,11 +32,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 public class Beer {
     @Id
     @UuidGenerator
     @Column(columnDefinition = "UUID", length = 36, updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
     private UUID id;
     @Version
     private Integer version;
@@ -59,5 +63,6 @@ public class Beer {
     @OneToMany(mappedBy = "beer")
     private Set<BeerOrderLine> beerOrderLines;
     @ManyToMany(mappedBy = "beers")
-    private Set<Category> categories;
+    @Builder.Default
+    private Set<Category> categories = new HashSet<>();
 }

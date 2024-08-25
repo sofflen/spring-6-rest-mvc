@@ -47,4 +47,14 @@ public class Category {
             inverseJoinColumns = @JoinColumn(name = "beer_id"))
     @Builder.Default
     Set<Beer> beers = new HashSet<>();
+
+    public void addBeer(Beer beer) {
+        this.beers.add(beer);
+        beer.getCategories().add(this);
+    }
+
+    public void removeBeer(Beer beer) {
+        this.beers.remove(beer);
+        beer.getCategories().remove(this);
+    }
 }

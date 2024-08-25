@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,11 +27,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 public class Customer {
     @Id
     @UuidGenerator
     @Column(columnDefinition = "UUID", length = 36, updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
     private UUID id;
     @Version
     private Integer version;
