@@ -17,6 +17,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -44,5 +45,6 @@ public class Customer {
     private String customerName;
     private String email;
     @OneToMany(mappedBy = "customer")
-    private Set<BeerOrder> beerOrders;
+    @Builder.Default
+    private Set<BeerOrder> beerOrders = new HashSet<>();
 }
