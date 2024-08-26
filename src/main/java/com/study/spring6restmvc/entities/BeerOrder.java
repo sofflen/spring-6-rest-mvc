@@ -1,11 +1,6 @@
 package com.study.spring6restmvc.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Version;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,8 +35,12 @@ public class BeerOrder {
     private Customer customer;
     @OneToMany(mappedBy = "beerOrder")
     private Set<BeerOrderLine> beerOrderLines;
+    @OneToOne(mappedBy = "beerOrder", cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "beer_order_shipment_id")
+    private BeerOrderShipment beerOrderShipment;
 
-    public BeerOrder(UUID id, Integer version, LocalDateTime createdAt, LocalDateTime updatedAt, String customerRef, Customer customer, Set<BeerOrderLine> beerOrderLines) {
+    public BeerOrder(UUID id, Integer version, LocalDateTime createdAt, LocalDateTime updatedAt, String customerRef,
+                     Customer customer, Set<BeerOrderLine> beerOrderLines, BeerOrderShipment beerOrderShipment) {
         this.id = id;
         this.version = version;
         this.createdAt = createdAt;
@@ -49,10 +48,16 @@ public class BeerOrder {
         this.customerRef = customerRef;
         this.setCustomer(customer);
         this.beerOrderLines = beerOrderLines;
+        this.setBeerOrderShipment(beerOrderShipment);
     }
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
         customer.getBeerOrders().add(this);
+    }
+
+    public void setBeerOrderShipment(BeerOrderShipment beerOrderShipment) {
+        this.beerOrderShipment = beerOrderShipment;
+        beerOrderShipment.setBeerOrder(this);
     }
 }
