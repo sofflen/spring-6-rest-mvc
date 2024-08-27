@@ -3,13 +3,12 @@ package com.study.spring6restmvc.entities;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Version;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,27 +26,35 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
-public class Customer {
+public class Category {
     @Id
     @UuidGenerator
     @Column(columnDefinition = "UUID", length = 36, updatable = false, nullable = false)
-    @EqualsAndHashCode.Include
     private UUID id;
     @Version
     private Integer version;
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
     @UpdateTimestamp
-    @Column(updatable = false)
     private LocalDateTime updatedAt;
-    @NotBlank
-    @Size(max = 50)
     @Column(length = 50)
-    private String customerName;
-    private String email;
-    @OneToMany(mappedBy = "customer")
+    private String description;
+    @ManyToMany
+    @JoinTable(name = "beer_category",
+            joinColumns = @JoinColumn(name = "category_id"),
+            inverseJoinColumns = @JoinColumn(name = "beer_id"))
     @Builder.Default
-    private Set<BeerOrder> beerOrders = new HashSet<>();
+    Set<Beer> beers = new HashSet<>();
+
+    public void addBeer(Beer beer) {
+        this.beers.add(beer);
+        beer.getCategories().add(this);
+    }
+
+    public void removeBeer(Beer beer) {
+        this.beers.remove(beer);
+        beer.getCategories().remove(this);
+    }
 }
