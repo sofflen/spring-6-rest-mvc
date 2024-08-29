@@ -22,10 +22,14 @@ import java.util.UUID;
 
 import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_PATH;
 import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_PATH_ID;
+import static com.study.spring6restmvc.util.TestUtils.AUTH_PASSWORD;
+import static com.study.spring6restmvc.util.TestUtils.AUTH_USERNAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,7 +55,9 @@ class CustomerControllerIntegrationTest {
     @BeforeEach
     void setUp() {
         testCustomer = customerRepository.findAll().getFirst();
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac)
+                .apply(springSecurity())
+                .build();
     }
 
     @Test
@@ -76,6 +82,7 @@ class CustomerControllerIntegrationTest {
     @Test
     void testGetAllCustomersWithQueryParamCustomerName() throws Exception {
         mockMvc.perform(get(CUSTOMER_PATH)
+                        .with(httpBasic(AUTH_USERNAME, AUTH_PASSWORD))
                         .queryParam("customerName", "john"))
                 .andExpectAll(status().isOk(),
                         jsonPath("$.size()", greaterThan(10)));
@@ -84,6 +91,7 @@ class CustomerControllerIntegrationTest {
     @Test
     void testGetAllCustomersWithQueryParamEmail() throws Exception {
         mockMvc.perform(get(CUSTOMER_PATH)
+                        .with(httpBasic(AUTH_USERNAME, AUTH_PASSWORD))
                         .queryParam("email", "john.doe@gmail.com"))
                 .andExpectAll(status().isOk(),
                         jsonPath("$.content.size()", is(1)));
@@ -92,6 +100,7 @@ class CustomerControllerIntegrationTest {
     @Test
     void testGetAllCustomersWithQueryParamCustomerNameAndEmail() throws Exception {
         mockMvc.perform(get(CUSTOMER_PATH)
+                        .with(httpBasic(AUTH_USERNAME, AUTH_PASSWORD))
                         .queryParam("customerName", "john")
                         .queryParam("email", "john.doe@gmail.com"))
                 .andExpectAll(status().isOk(),
@@ -101,6 +110,7 @@ class CustomerControllerIntegrationTest {
     @Test
     void testGetAllCustomersWithQueryParamCustomerNamePageTwo() throws Exception {
         mockMvc.perform(get(CUSTOMER_PATH)
+                        .with(httpBasic(AUTH_USERNAME, AUTH_PASSWORD))
                         .queryParam("customerName", "jo")
                         .queryParam("pageNumber", "2")
                         .queryParam("pageSize", "30"))
@@ -217,10 +227,18 @@ class CustomerControllerIntegrationTest {
 
 
         mockMvc.perform(patch(CUSTOMER_PATH_ID, testCustomer.getId())
+                        .with(httpBasic(AUTH_USERNAME, AUTH_PASSWORD))
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(jsonMap)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.length()", is(1)));
+    }
+
+    @Test
+    void testGetAllCustomersWithNoAuthReturnsUnauthorized() throws Exception {
+        mockMvc.perform(get(CUSTOMER_PATH)
+                        .queryParam("customerName", "john"))
+                .andExpect(status().isUnauthorized());
     }
 }
