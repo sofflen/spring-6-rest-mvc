@@ -41,37 +41,36 @@ class BeerRepositoryTest {
 
     @Test
     void saveBeerWithTooLongNameThrowsConstraintViolationException() {
-        assertThrows(ConstraintViolationException.class, () -> {
-            String tooLongName = "beer 01234567890123456789012345678901234567890123456789";
-            beerRepository.save(Beer.builder()
-                    .beerName(tooLongName)
-                    .beerStyle(BeerStyle.PALE_ALE)
-                    .upc("123123123")
-                    .price(new BigDecimal("11.99"))
-                    .build());
+        String tooLongName = "beer 01234567890123456789012345678901234567890123456789";
+        var testBeer = Beer.builder()
+                .beerName(tooLongName)
+                .beerStyle(BeerStyle.PALE_ALE)
+                .upc("123123123")
+                .price(new BigDecimal("11.99"))
+                .build();
 
-            beerRepository.flush();
-        });
+        assertThrows(ConstraintViolationException.class,
+                () -> beerRepository.saveAndFlush(testBeer));
     }
 
     @Test
     void getBeersByBeerNameIsLikeIgnoreCase() {
         var beerPage = beerRepository.findAllByBeerNameIsLikeIgnoreCase("%IPA%", null);
 
-        assertThat(beerPage.getContent().size()).isGreaterThan(300);
+        assertThat(beerPage.getContent()).hasSizeGreaterThan(300);
     }
 
     @Test
     void getBeersByBeerStyle() {
         var beerPage = beerRepository.findAllByBeerStyle(BeerStyle.PALE_ALE, null);
 
-        assertThat(beerPage.getContent().size()).isGreaterThan(10);
+        assertThat(beerPage.getContent()).hasSizeGreaterThan(10);
     }
 
     @Test
     void getBeersByBeerNameAndBeerStyle() {
         var beerPage = beerRepository.findAllByBeerNameIsLikeIgnoreCaseAndBeerStyle("%india%", BeerStyle.IPA, null);
 
-        assertThat(beerPage.getContent().size()).isGreaterThan(40);
+        assertThat(beerPage.getContent()).hasSizeGreaterThan(40);
     }
 }

@@ -65,10 +65,10 @@ class BeerControllerIntegrationTest {
 
     @Test
     void testGetAllBeers() {
-        var beerDtoPage = beerController.getAllBeers(null, null, false, 1, 2400);
+        var beerDTOPagedModel = beerController.getAllBeers(null, null, false, 1, 2400);
 
-        assertThat(beerDtoPage).isNotNull();
-        assertThat(beerDtoPage.getContent().size()).isEqualTo(1000);
+        assertThat(beerDTOPagedModel).isNotNull();
+        assertThat(beerDTOPagedModel.getContent()).hasSize(1000);
     }
 
     @Test
@@ -76,10 +76,10 @@ class BeerControllerIntegrationTest {
     void testGetAllBeersReturnsEmptyListIfNoBeers() {
         beerRepository.deleteAll();
 
-        var beerDtoPage = beerController.getAllBeers(null, null, false, 1, 25);
+        var beerDTOPagedModel = beerController.getAllBeers(null, null, false, 1, 25);
 
-        assertThat(beerDtoPage).isNotNull();
-        assertThat(beerDtoPage.getContent()).isEmpty();
+        assertThat(beerDTOPagedModel).isNotNull();
+        assertThat(beerDTOPagedModel.getContent()).isEmpty();
     }
 
     @Test
@@ -98,7 +98,7 @@ class BeerControllerIntegrationTest {
                         .with(httpBasic(AUTH_USERNAME, AUTH_PASSWORD))
                         .queryParam("beerStyle", BeerStyle.IPA.name()))
                 .andExpectAll(status().isOk(),
-                        jsonPath("$.size()", greaterThan(10)));
+                        jsonPath("$.content.size()", greaterThan(10)));
     }
 
     @Test
@@ -147,7 +147,6 @@ class BeerControllerIntegrationTest {
 
     @Test
     void testGetBeerById() {
-        var testBeer = beerRepository.findAll().getFirst();
         var beerDto = beerController.getBeerById(testBeer.getId());
 
         assertThat(beerDto).isNotNull();
@@ -155,8 +154,10 @@ class BeerControllerIntegrationTest {
 
     @Test
     void testGetBeerByIdThrowsNotFoundExceptionIfBeerDoesNotExist() {
+        var randomUuid = UUID.randomUUID();
+
         assertThrows(NotFoundException.class,
-                () -> beerController.getBeerById(UUID.randomUUID()));
+                () -> beerController.getBeerById(randomUuid));
     }
 
     @Test
@@ -179,14 +180,16 @@ class BeerControllerIntegrationTest {
 
     @Test
     void testUpdateBeerThrowsNotFoundExceptionIfBeerDoesNotExist() {
+        var randomUuid = UUID.randomUUID();
+        var beerDto = BeerDTO.builder().build();
+
         assertThrows(NotFoundException.class,
-                () -> beerController.updateBeerById(UUID.randomUUID(), BeerDTO.builder().build()));
+                () -> beerController.updateBeerById(randomUuid, beerDto));
     }
 
     @Test
     @Transactional
     void testUpdateBeer() {
-        var testBeer = beerRepository.findAll().getFirst();
         var beerDto = beerMapper.beerToBeerDTO(testBeer);
         final String newBeerName = "New Beer";
 
@@ -208,22 +211,23 @@ class BeerControllerIntegrationTest {
     void testDeleteBeerById() {
         var beerId = testBeer.getId();
 
-        var ResponseEntity = beerController.deleteBeerById(beerId);
+        var responseEntity = beerController.deleteBeerById(beerId);
 
-        assertThat(ResponseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
-        assertThat(beerRepository.findById(beerId).isEmpty()).isTrue();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
+        assertThat(beerRepository.findById(beerId)).isEmpty();
     }
 
     @Test
     void testDeleteByIdThrowsNotFoundExceptionIfBeerDoesNotExist() {
+        var randomUuid = UUID.randomUUID();
+
         assertThrows(NotFoundException.class,
-                () -> beerController.deleteBeerById(UUID.randomUUID()));
+                () -> beerController.deleteBeerById(randomUuid));
     }
 
     @Test
     @Transactional
     void testPatchBeerById() {
-        var testBeer = beerRepository.findAll().getFirst();
         var beerDto = beerMapper.beerToBeerDTO(testBeer);
         final String newBeerName = "New Beer";
 
