@@ -12,13 +12,13 @@ import java.util.List;
 @Service
 public class CustomerCsvService implements CsvService<CustomerCsvRecord> {
     @Override
-    public List<CustomerCsvRecord> convertCSVToList(File csvFile) {
+    public List<CustomerCsvRecord> convertCSVToList(File csvFile) throws FileNotFoundException {
         try {
             return new CsvToBeanBuilder<CustomerCsvRecord>(new FileReader(csvFile))
                     .withType(CustomerCsvRecord.class)
                     .build().parse();
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new FileNotFoundException("Missing .csv file with customer records");
         }
     }
 }
