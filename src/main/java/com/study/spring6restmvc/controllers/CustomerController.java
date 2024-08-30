@@ -5,7 +5,7 @@ import com.study.spring6restmvc.model.CustomerDTO;
 import com.study.spring6restmvc.services.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +25,8 @@ public class CustomerController {
     public static final String CUSTOMER_PATH_ID = "/api/v1/customer/{id}";
 
     @GetMapping(CUSTOMER_PATH)
-    public Page<CustomerDTO> getAllCustomers(@RequestParam(required = false) String customerName,
-                                             @RequestParam(required = false) String email, Integer pageNumber, Integer pageSize) {
+    public PagedModel<CustomerDTO> getAllCustomers(@RequestParam(required = false) String customerName,
+                                                   @RequestParam(required = false) String email, Integer pageNumber, Integer pageSize) {
         log.info("CustomerController: getAllCustomers()");
         var customerPage = customerService.getAllCustomers(customerName, email, pageNumber, pageSize);
 
@@ -34,7 +34,7 @@ public class CustomerController {
             throw new NotFoundException();
         }
 
-        return customerPage;
+        return new PagedModel<>(customerPage);
     }
 
     @GetMapping(CUSTOMER_PATH_ID)

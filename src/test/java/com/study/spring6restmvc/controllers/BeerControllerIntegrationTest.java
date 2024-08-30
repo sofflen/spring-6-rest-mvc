@@ -79,7 +79,7 @@ class BeerControllerIntegrationTest {
         var beerDtoPage = beerController.getAllBeers(null, null, false, 1, 25);
 
         assertThat(beerDtoPage).isNotNull();
-        assertThat(beerDtoPage.isEmpty()).isTrue();
+        assertThat(beerDtoPage.getContent()).isEmpty();
     }
 
     @Test
