@@ -6,7 +6,7 @@ import com.study.spring6restmvc.model.BeerStyle;
 import com.study.spring6restmvc.services.BeerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +26,11 @@ public class BeerController {
     public static final String BEER_PATH_ID = "/api/v1/beer/{id}";
 
     @GetMapping(BEER_PATH)
-    public Page<BeerDTO> getAllBeers(@RequestParam(required = false) String beerName,
-                                     @RequestParam(required = false) BeerStyle beerStyle,
-                                     @RequestParam(required = false) Boolean showInventory,
-                                     @RequestParam(required = false) Integer pageNumber,
-                                     @RequestParam(required = false) Integer pageSize) {
+    public PagedModel<BeerDTO> getAllBeers(@RequestParam(required = false) String beerName,
+                                           @RequestParam(required = false) BeerStyle beerStyle,
+                                           @RequestParam(required = false) Boolean showInventory,
+                                           @RequestParam(required = false) Integer pageNumber,
+                                           @RequestParam(required = false) Integer pageSize) {
         log.info("BeerController: getAllBeers()");
 
         var beerPage = beerService.getAllBeers(beerName, beerStyle, showInventory, pageNumber, pageSize);
@@ -39,7 +39,7 @@ public class BeerController {
             throw new NotFoundException("Beer not found");
         }
 
-        return beerPage;
+        return new PagedModel<>(beerPage);
     }
 
     @GetMapping(BEER_PATH_ID)

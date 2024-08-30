@@ -62,10 +62,10 @@ class CustomerControllerIntegrationTest {
 
     @Test
     void testGetAllCustomers() {
-        var customerDtoPage = customerController.getAllCustomers(null, null, 1, 2000);
+        var customerDTOPagedModel = customerController.getAllCustomers(null, null, 1, 2000);
 
-        assertThat(customerDtoPage).isNotNull();
-        assertThat(customerDtoPage.getContent().size()).isEqualTo(1000);
+        assertThat(customerDTOPagedModel).isNotNull();
+        assertThat(customerDTOPagedModel.getContent()).hasSize(1000);
     }
 
     @Test
@@ -73,10 +73,10 @@ class CustomerControllerIntegrationTest {
     void testGetAllCustomersReturnsEmptyListIfNoCustomers() {
         customerRepository.deleteAll();
 
-        var customerDtoPage = customerController.getAllCustomers(null, null, 1, 25);
+        var customerDTOPagedModel = customerController.getAllCustomers(null, null, 1, 25);
 
-        assertThat(customerDtoPage).isNotNull();
-        assertThat(customerDtoPage.isEmpty()).isTrue();
+        assertThat(customerDTOPagedModel).isNotNull();
+        assertThat(customerDTOPagedModel.getContent()).isEmpty();
     }
 
     @Test
@@ -85,7 +85,7 @@ class CustomerControllerIntegrationTest {
                         .with(httpBasic(AUTH_USERNAME, AUTH_PASSWORD))
                         .queryParam("customerName", "john"))
                 .andExpectAll(status().isOk(),
-                        jsonPath("$.size()", greaterThan(10)));
+                        jsonPath("$.content.size()", greaterThan(10)));
     }
 
     @Test
@@ -126,16 +126,17 @@ class CustomerControllerIntegrationTest {
 
     @Test
     void getCustomerById() {
-        var customer = customerRepository.findAll().getFirst();
-        var customerDto = customerController.getCustomerById(customer.getId());
+        var customerDto = customerController.getCustomerById(testCustomer.getId());
 
         assertThat(customerDto).isNotNull();
     }
 
     @Test
     void getCustomerByIdThrowsNotFoundExceptionIfCustomerDoesNotExist() {
+        var randomUuid = UUID.randomUUID();
+
         assertThrows(NotFoundException.class,
-                () -> customerController.getCustomerById(UUID.randomUUID()));
+                () -> customerController.getCustomerById(randomUuid));
     }
 
     @Test
@@ -158,14 +159,16 @@ class CustomerControllerIntegrationTest {
 
     @Test
     void testUpdateCustomerThrowsNotFoundExceptionIfCustomerDoesNotExist() {
+        var randomUuid = UUID.randomUUID();
+        var customerDto = CustomerDTO.builder().build();
+
         assertThrows(NotFoundException.class,
-                () -> customerController.updateCustomerById(UUID.randomUUID(), CustomerDTO.builder().build()));
+                () -> customerController.updateCustomerById(randomUuid, customerDto));
     }
 
     @Test
     @Transactional
     void testUpdateCustomer() {
-        var testCustomer = customerRepository.findAll().getFirst();
         var customerDto = customerMapper.customerToCustomerDTO(testCustomer);
         final String newCustomerName = "New Customer";
 
@@ -187,22 +190,23 @@ class CustomerControllerIntegrationTest {
     void testDeleteCustomerById() {
         var customerId = testCustomer.getId();
 
-        var ResponseEntity = customerController.deleteCustomerById(customerId);
+        var responseEntity = customerController.deleteCustomerById(customerId);
 
-        assertThat(ResponseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
-        assertThat(customerRepository.findById(customerId).isEmpty()).isTrue();
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
+        assertThat(customerRepository.findById(customerId)).isEmpty();
     }
 
     @Test
     void testDeleteByIdThrowsNotFoundExceptionIfCustomerDoesNotExist() {
+        var randomUuid = UUID.randomUUID();
+
         assertThrows(NotFoundException.class,
-                () -> customerController.deleteCustomerById(UUID.randomUUID()));
+                () -> customerController.deleteCustomerById(randomUuid));
     }
 
     @Test
     @Transactional
     void testPatchCustomerById() {
-        var testCustomer = customerRepository.findAll().getFirst();
         var customerDto = customerMapper.customerToCustomerDTO(testCustomer);
         final String newCustomerName = "New Customer";
 

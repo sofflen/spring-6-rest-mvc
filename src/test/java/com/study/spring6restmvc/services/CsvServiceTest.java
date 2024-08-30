@@ -22,8 +22,9 @@ class CsvServiceTest {
         csvFile = ResourceUtils.getFile("classpath:csvdata/beers.csv");
         var beerCsvRecordList = beerCsvService.convertCSVToList(csvFile);
 
-        assertThat(beerCsvRecordList).isNotNull();
-        assertThat(beerCsvRecordList.size()).isEqualTo(2410);
+        assertThat(beerCsvRecordList)
+                .isNotNull()
+                .hasSize(2410);
     }
 
     @Test
@@ -31,7 +32,8 @@ class CsvServiceTest {
         csvFile = ResourceUtils.getFile("classpath:csvdata/customers.csv");
         var customerCsvRecordList = customerCsvService.convertCSVToList(csvFile);
 
-        assertThat(customerCsvRecordList).isNotNull();
-        assertThat(customerCsvRecordList.size()).isEqualTo(2000);
+        assertThat(customerCsvRecordList)
+                .isNotNull()
+                .hasSize(2000);
     }
 }

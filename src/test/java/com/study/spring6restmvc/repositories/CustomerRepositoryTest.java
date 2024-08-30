@@ -35,28 +35,27 @@ class CustomerRepositoryTest {
 
     @Test
     void saveCustomerWithTooLongNameThrowsConstraintViolationException() {
-        assertThrows(ConstraintViolationException.class, () -> {
-            String tooLongName = "Customer 01234567890123456789012345678901234567890123456789";
-            customerRepository.save(Customer.builder()
-                    .customerName(tooLongName)
-                    .build());
+        String tooLongName = "Customer 01234567890123456789012345678901234567890123456789";
+        var customer = Customer.builder()
+                .customerName(tooLongName)
+                .build();
 
-            customerRepository.flush();
-        });
+        assertThrows(ConstraintViolationException.class,
+                () -> customerRepository.saveAndFlush(customer));
     }
 
     @Test
     void getCustomersByCustomerNameIsLikeIgnoreCase() {
         var customerPage = customerRepository.findAllByCustomerNameIsLikeIgnoreCase("%john%", null);
 
-        assertThat(customerPage.getContent().size()).isGreaterThan(10);
+        assertThat(customerPage.getContent()).hasSizeGreaterThan(10);
     }
 
     @Test
     void getBeersByBeerStyle() {
         var customerPage = customerRepository.findAllByEmail("john.doe@gmail.com", null);
 
-        assertThat(customerPage.getContent().size()).isEqualTo(1);
+        assertThat(customerPage.getContent()).hasSize(1);
     }
 
     @Test
@@ -64,6 +63,6 @@ class CustomerRepositoryTest {
         var customerPage = customerRepository
                 .findAllByCustomerNameIsLikeIgnoreCaseAndEmail("%john%", "john.doe@gmail.com", null);
 
-        assertThat(customerPage.getContent().size()).isEqualTo(1);
+        assertThat(customerPage.getContent()).hasSize(1);
     }
 }
