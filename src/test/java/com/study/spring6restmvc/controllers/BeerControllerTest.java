@@ -2,7 +2,7 @@ package com.study.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.config.JwtDecoderMockConfig;
-import com.study.spring6restmvc.config.SpringSecurityConfig;
+import com.study.spring6restmvc.config.SecurityTestConfig;
 import com.study.spring6restmvc.model.BeerDTO;
 import com.study.spring6restmvc.model.BeerStyle;
 import com.study.spring6restmvc.services.BeerService;
@@ -26,7 +26,7 @@ import java.util.UUID;
 import static com.study.spring6restmvc.controllers.BeerController.BEER_PATH;
 import static com.study.spring6restmvc.controllers.BeerController.BEER_PATH_ID;
 import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_KEY;
-import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_VALUE;
+import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_MOCK_VALUE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BeerController.class)
-@Import({SpringSecurityConfig.class, JwtDecoderMockConfig.class})
+@Import({SecurityTestConfig.class, JwtDecoderMockConfig.class})
 class BeerControllerTest {
 
     @Autowired
@@ -80,7 +80,7 @@ class BeerControllerTest {
 
         mockMvc.perform(
                         patch(BEER_PATH_ID, testBeerDto.getId())
-                                .header(AUTH_HEADER_KEY, AUTH_HEADER_VALUE)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(jsonMap)))
@@ -99,7 +99,7 @@ class BeerControllerTest {
 
         mockMvc.perform(
                         delete(BEER_PATH_ID, testBeerDto.getId())
-                                .header(AUTH_HEADER_KEY, AUTH_HEADER_VALUE)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(
                         status().isNoContent());
@@ -115,7 +115,7 @@ class BeerControllerTest {
 
         mockMvc.perform(
                         put(BEER_PATH_ID, testBeerDto.getId())
-                                .header(AUTH_HEADER_KEY, AUTH_HEADER_VALUE)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(testBeerDto)))
@@ -133,7 +133,7 @@ class BeerControllerTest {
         given(beerService.updateBeerById(any(UUID.class), any(BeerDTO.class))).willReturn(Optional.of(testBeerDto));
 
         mockMvc.perform(put(BEER_PATH_ID, testBeerDto.getId())
-                        .header(AUTH_HEADER_KEY, AUTH_HEADER_VALUE)
+                        .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testBeerDto)))
@@ -155,7 +155,7 @@ class BeerControllerTest {
 
         mockMvc.perform(
                         post(BEER_PATH)
-                                .header(AUTH_HEADER_KEY, AUTH_HEADER_VALUE)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(beerDto)))
@@ -172,7 +172,7 @@ class BeerControllerTest {
 
         mockMvc.perform(
                         post(BEER_PATH)
-                                .header(AUTH_HEADER_KEY, AUTH_HEADER_VALUE)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(testBeerDto)))
@@ -187,7 +187,7 @@ class BeerControllerTest {
 
         mockMvc.perform(
                         get(BEER_PATH)
-                                .header(AUTH_HEADER_KEY, AUTH_HEADER_VALUE))
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -204,7 +204,7 @@ class BeerControllerTest {
 
         mockMvc.perform(
                         get(BEER_PATH_ID, UUID.randomUUID())
-                                .header(AUTH_HEADER_KEY, AUTH_HEADER_VALUE))
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE))
                 .andExpect(
                         status().isNotFound());
     }
@@ -217,7 +217,7 @@ class BeerControllerTest {
 
         mockMvc.perform(
                         get(BEER_PATH_ID, beerDtoId)
-                                .header(AUTH_HEADER_KEY, AUTH_HEADER_VALUE)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpectAll(
                         status().isOk(),

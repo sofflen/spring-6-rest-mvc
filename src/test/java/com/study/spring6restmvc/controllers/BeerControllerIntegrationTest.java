@@ -1,6 +1,7 @@
 package com.study.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.study.spring6restmvc.config.SecurityTestConfig;
 import com.study.spring6restmvc.entities.Beer;
 import com.study.spring6restmvc.exceptions.NotFoundException;
 import com.study.spring6restmvc.mappers.BeerMapper;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,15 +25,14 @@ import java.util.UUID;
 
 import static com.study.spring6restmvc.controllers.BeerController.BEER_PATH;
 import static com.study.spring6restmvc.controllers.BeerController.BEER_PATH_ID;
-import static com.study.spring6restmvc.util.TestUtils.AUTH_PASSWORD;
-import static com.study.spring6restmvc.util.TestUtils.AUTH_USERNAME;
+import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_GENERATED_VALUE;
+import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -39,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@Import(SecurityTestConfig.class)
 class BeerControllerIntegrationTest {
 
     @Autowired
@@ -84,57 +86,67 @@ class BeerControllerIntegrationTest {
 
     @Test
     void testGetAllBeersWithQueryParamBeerName() throws Exception {
-        mockMvc.perform(get(BEER_PATH)
-                        .with(httpBasic(AUTH_USERNAME, AUTH_PASSWORD))
-                        .queryParam("beerName", BeerStyle.IPA.name())
-                        .queryParam("pageSize", "1000"))
-                .andExpectAll(status().isOk(),
+        mockMvc.perform(
+                        get(BEER_PATH)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .queryParam("beerName", BeerStyle.IPA.name())
+                                .queryParam("pageSize", "1000"))
+                .andExpectAll(
+                        status().isOk(),
                         jsonPath("$.content.size()", greaterThan(300)));
     }
 
     @Test
     void testGetAllBeersWithQueryParamBeerStyle() throws Exception {
-        mockMvc.perform(get(BEER_PATH)
-                        .with(httpBasic(AUTH_USERNAME, AUTH_PASSWORD))
-                        .queryParam("beerStyle", BeerStyle.IPA.name()))
-                .andExpectAll(status().isOk(),
+        mockMvc.perform(
+                        get(BEER_PATH)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .queryParam("beerStyle", BeerStyle.IPA.name()))
+                .andExpectAll(
+                        status().isOk(),
                         jsonPath("$.content.size()", greaterThan(10)));
     }
 
     @Test
     void testGetAllBeersWithQueryParamBeerNameAndBeerStyle() throws Exception {
-        mockMvc.perform(get(BEER_PATH)
-                        .with(httpBasic(AUTH_USERNAME, AUTH_PASSWORD))
-                        .queryParam("beerName", "India")
-                        .queryParam("beerStyle", "IPA")
-                        .queryParam("pageSize", "1000"))
-                .andExpectAll(status().isOk(),
+        mockMvc.perform(
+                        get(BEER_PATH)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .queryParam("beerName", "India")
+                                .queryParam("beerStyle", "IPA")
+                                .queryParam("pageSize", "1000"))
+                .andExpectAll(
+                        status().isOk(),
                         jsonPath("$.content.size()", greaterThan(40)));
     }
 
     @Test
     void testGetAllBeersWithQueryParamBeerNameAndBeerStyleShowInventory() throws Exception {
-        mockMvc.perform(get(BEER_PATH)
-                        .with(httpBasic(AUTH_USERNAME, AUTH_PASSWORD))
-                        .queryParam("beerName", "IPA")
-                        .queryParam("beerStyle", BeerStyle.IPA.name())
-                        .queryParam("showInventory", "false")
-                        .queryParam("pageSize", "1000"))
-                .andExpectAll(status().isOk(),
+        mockMvc.perform(
+                        get(BEER_PATH)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .queryParam("beerName", "IPA")
+                                .queryParam("beerStyle", BeerStyle.IPA.name())
+                                .queryParam("showInventory", "false")
+                                .queryParam("pageSize", "1000"))
+                .andExpectAll(
+                        status().isOk(),
                         jsonPath("$.content.size()", greaterThan(300)),
                         jsonPath("$.content.[0].quantityOnHand").value(nullValue()));
     }
 
     @Test
     void testGetAllBeersWithQueryParamBeerNameAndBeerStyleShowInventoryTruePageTwo() throws Exception {
-        mockMvc.perform(get(BEER_PATH)
-                        .with(httpBasic(AUTH_USERNAME, AUTH_PASSWORD))
-                        .queryParam("beerName", "IPA")
-                        .queryParam("beerStyle", BeerStyle.IPA.name())
-                        .queryParam("showInventory", "true")
-                        .queryParam("pageNumber", "2")
-                        .queryParam("pageSize", "50"))
-                .andExpectAll(status().isOk(),
+        mockMvc.perform(
+                        get(BEER_PATH)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .queryParam("beerName", "IPA")
+                                .queryParam("beerStyle", BeerStyle.IPA.name())
+                                .queryParam("showInventory", "true")
+                                .queryParam("pageNumber", "2")
+                                .queryParam("pageSize", "50"))
+                .andExpectAll(
+                        status().isOk(),
                         jsonPath("$.content.size()", is(50)),
                         jsonPath("$.content.[0].quantityOnHand").value(notNullValue()));
     }
@@ -251,20 +263,24 @@ class BeerControllerIntegrationTest {
         jsonMap.put("beerName", tooLongName);
 
 
-        mockMvc.perform(patch(BEER_PATH_ID, testBeer.getId())
-                        .with(httpBasic(AUTH_USERNAME, AUTH_PASSWORD))
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(jsonMap)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.length()", is(1)));
+        mockMvc.perform(
+                        patch(BEER_PATH_ID, testBeer.getId())
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(jsonMap)))
+                .andExpectAll(
+                        status().isBadRequest(),
+                        jsonPath("$.length()", is(1)));
     }
 
     @Test
     void testGetAllBeersWithNoAuthReturnsUnauthorized() throws Exception {
-        mockMvc.perform(get(BEER_PATH)
-                        .queryParam("beerName", BeerStyle.IPA.name())
-                        .queryParam("pageSize", "1000"))
-                .andExpect(status().isUnauthorized());
+        mockMvc.perform(
+                        get(BEER_PATH)
+                                .queryParam("beerName", BeerStyle.IPA.name())
+                                .queryParam("pageSize", "1000"))
+                .andExpect(
+                        status().isUnauthorized());
     }
 }

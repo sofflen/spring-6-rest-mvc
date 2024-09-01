@@ -4,6 +4,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -16,7 +17,8 @@ public class JwtDecoderMockConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     String issuer;
 
-    @Bean
+    @Bean("mockJwtDecoder")
+    @Primary
     public JwtDecoder jwtDecoder() {
         JwtDecoder jwtDecoder = Mockito.mock(JwtDecoder.class);
 
