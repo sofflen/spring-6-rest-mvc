@@ -22,7 +22,7 @@ public class TestUtils {
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256).build();
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
-                .issuer("http://localhost:8081")
+                .issuer("http://localhost:9000")
                 .subject("oidc-client")
                 .audience("oidc-client")
                 .issueTime(new Date())
