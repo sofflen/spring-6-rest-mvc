@@ -30,6 +30,7 @@
         <java.version>21</java.version>
         <mapstruct.version>1.6.0</mapstruct.version>
         <springdoc.version>2.6.0</springdoc.version>
+        <swagger.validator.version>2.42.0</swagger.validator.version>
     </properties>
     <dependencies>
         <dependency>
@@ -102,6 +103,18 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.oai</groupId>
+            <artifactId>swagger-request-validator-restassured</artifactId>
+            <version>${swagger.validator.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
