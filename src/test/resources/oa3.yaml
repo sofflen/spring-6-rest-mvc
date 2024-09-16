@@ -290,10 +290,16 @@ paths:
               $ref: "#/components/schemas/BeerDTO"
         required: true
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
+          headers:
+            Location:
+              description: Location
+              required: true
+              allowEmptyValue: false
+
           content:
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/BeerDTO"
 components:
