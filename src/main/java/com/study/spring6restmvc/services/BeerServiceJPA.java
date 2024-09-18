@@ -81,12 +81,12 @@ public class BeerServiceJPA implements BeerService {
 
     @Override
     public Optional<BeerDTO> updateBeerById(UUID beerId, BeerDTO beer) {
-        clearCache(beerId);
-
         AtomicReference<BeerDTO> atomicReference = new AtomicReference<>();
 
         beerRepository.findById(beerId).ifPresentOrElse(
                 foundBeer -> {
+                    clearCache(beerId);
+
                     foundBeer.setBeerName(beer.getBeerName());
                     foundBeer.setBeerStyle(beer.getBeerStyle());
                     foundBeer.setUpc(beer.getUpc());
@@ -105,9 +105,8 @@ public class BeerServiceJPA implements BeerService {
 
     @Override
     public boolean deleteBeerById(UUID beerId) {
-        clearCache(beerId);
-
         if (beerRepository.existsById(beerId)) {
+            clearCache(beerId);
             beerRepository.deleteById(beerId);
             return true;
         }
@@ -116,12 +115,12 @@ public class BeerServiceJPA implements BeerService {
 
     @Override
     public Optional<BeerDTO> patchBeerById(UUID beerId, BeerDTO beer) {
-        clearCache(beerId);
-
         AtomicReference<BeerDTO> atomicReference = new AtomicReference<>();
 
         beerRepository.findById(beerId).ifPresentOrElse(
                 foundBeer -> {
+                    clearCache(beerId);
+
                     if (hasText(beer.getBeerName()))
                         foundBeer.setBeerName(beer.getBeerName());
                     if (beer.getBeerStyle() != null)

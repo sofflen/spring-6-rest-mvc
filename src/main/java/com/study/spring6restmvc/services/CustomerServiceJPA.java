@@ -6,6 +6,8 @@ import com.study.spring6restmvc.model.CustomerDTO;
 import com.study.spring6restmvc.repositories.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
@@ -30,6 +32,7 @@ public class CustomerServiceJPA implements CustomerService {
 
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
+    private final CacheManager cacheManager;
 
     @Override
     @Cacheable(cacheNames = "customerCache")
@@ -42,7 +45,7 @@ public class CustomerServiceJPA implements CustomerService {
     }
 
     @Override
-    @Cacheable(cacheNames = "customerListCache")
+    @Cacheable(cacheNames = "customerListCache", condition = "pageNumber == null || pageSize == null")
     public Page<CustomerDTO> getAllCustomers(String customerName, String email, Integer pageNumber, Integer pageSize) {
         log.info("CustomerService: getAllCustomers");
 
@@ -64,6 +67,7 @@ public class CustomerServiceJPA implements CustomerService {
 
     @Override
     public CustomerDTO saveCustomer(CustomerDTO customer) {
+        clearCache(null);
         return customerMapper.customerToCustomerDTO(
                 customerRepository.save(
                         customerMapper.customerDtoToCustomer(customer)));
@@ -75,6 +79,8 @@ public class CustomerServiceJPA implements CustomerService {
 
         customerRepository.findById(customerId).ifPresentOrElse(
                 foundCustomer -> {
+                    clearCache(customerId);
+
                     if (StringUtils.hasText(customer.getCustomerName())) {
                         foundCustomer.setCustomerName(customer.getCustomerName());
                     }
@@ -92,6 +98,7 @@ public class CustomerServiceJPA implements CustomerService {
     @Override
     public boolean deleteCustomerById(UUID customerId) {
         if (customerRepository.existsById(customerId)) {
+            clearCache(customerId);
             customerRepository.deleteById(customerId);
             return true;
         }
@@ -104,6 +111,8 @@ public class CustomerServiceJPA implements CustomerService {
 
         customerRepository.findById(customerId).ifPresentOrElse(
                 foundCustomer -> {
+                    clearCache(customerId);
+
                     if (customer.getCustomerName() != null) {
                         foundCustomer.setCustomerName(customer.getCustomerName());
                     }
@@ -130,5 +139,21 @@ public class CustomerServiceJPA implements CustomerService {
 
     private Page<Customer> getCustomersByEmail(String email, Pageable pageable) {
         return customerRepository.findAllByEmail(email, pageable);
+    }
+
+    private void clearCache(UUID customerId) {
+        Cache beerListCache = cacheManager.getCache("customerListCache");
+
+        if (beerListCache != null) {
+            beerListCache.clear();
+        }
+
+        if (customerId != null) {
+            Cache beerCache = cacheManager.getCache("customerCache");
+
+            if (beerCache != null) {
+                beerCache.evict(customerId);
+            }
+        }
     }
 }
