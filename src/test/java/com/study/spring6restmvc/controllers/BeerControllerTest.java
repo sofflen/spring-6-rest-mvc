@@ -2,7 +2,6 @@ package com.study.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.config.JwtDecoderMockConfig;
-import com.study.spring6restmvc.config.SecurityTestConfig;
 import com.study.spring6restmvc.model.BeerDTO;
 import com.study.spring6restmvc.model.BeerStyle;
 import com.study.spring6restmvc.services.BeerService;
@@ -45,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BeerController.class)
-@Import({SecurityTestConfig.class, JwtDecoderMockConfig.class})
+@Import(JwtDecoderMockConfig.class)
 class BeerControllerTest {
 
     @Autowired

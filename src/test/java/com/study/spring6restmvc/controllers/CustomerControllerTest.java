@@ -2,7 +2,6 @@ package com.study.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.config.JwtDecoderMockConfig;
-import com.study.spring6restmvc.config.SecurityTestConfig;
 import com.study.spring6restmvc.model.CustomerDTO;
 import com.study.spring6restmvc.services.CustomerService;
 import com.study.spring6restmvc.services.CustomerServiceImpl;
@@ -43,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CustomerController.class)
-@Import({SecurityTestConfig.class, JwtDecoderMockConfig.class})
+@Import(JwtDecoderMockConfig.class)
 class CustomerControllerTest {
 
     @Autowired
