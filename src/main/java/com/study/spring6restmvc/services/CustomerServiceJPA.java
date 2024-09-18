@@ -5,6 +5,8 @@ import com.study.spring6restmvc.mappers.CustomerMapper;
 import com.study.spring6restmvc.model.CustomerDTO;
 import com.study.spring6restmvc.repositories.CustomerRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,20 +25,27 @@ import static org.springframework.util.StringUtils.hasText;
 @Service
 @Primary
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerServiceJPA implements CustomerService {
 
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
 
     @Override
+    @Cacheable(cacheNames = "customerCache")
     public Optional<CustomerDTO> getCustomerById(UUID id) {
+        log.info("CustomerService: getCustomerById({})", id);
+
         return Optional.ofNullable(
                 customerMapper.customerToCustomerDTO(
                         customerRepository.findById(id).orElse(null)));
     }
 
     @Override
+    @Cacheable(cacheNames = "customerListCache")
     public Page<CustomerDTO> getAllCustomers(String customerName, String email, Integer pageNumber, Integer pageSize) {
+        log.info("CustomerService: getAllCustomers");
+
         PageRequest pageRequest = ServiceUtils.buildPageRequest(pageNumber, pageSize, Sort.by("customerName"));
         Page<Customer> customerPage;
 

@@ -6,6 +6,8 @@ import com.study.spring6restmvc.model.BeerDTO;
 import com.study.spring6restmvc.model.BeerStyle;
 import com.study.spring6restmvc.repositories.BeerRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,21 +26,27 @@ import static org.springframework.util.StringUtils.hasText;
 @Service
 @Primary
 @RequiredArgsConstructor
+@Slf4j
 public class BeerServiceJPA implements BeerService {
 
     private final BeerRepository beerRepository;
     private final BeerMapper beerMapper;
 
     @Override
+    @Cacheable(cacheNames = "beerCache", key = "#beerId")
     public Optional<BeerDTO> getBeerById(UUID beerId) {
+        log.info("BeerService: getBeerById({})", beerId);
         return Optional.ofNullable(
                 beerMapper.beerToBeerDTO(
                         beerRepository.findById(beerId).orElse(null)));
     }
 
     @Override
+    @Cacheable(cacheNames = "beerListCache", condition = "(#beerName != null && #beerStyle == null && #showInventory == null && #pageNumber == null && #pageSize == null) || (#beerName == null && #beerStyle == null && #showInventory == null && #pageNumber == null && #pageSize == null)")
     public Page<BeerDTO> getAllBeers(String beerName, BeerStyle beerStyle, Boolean showInventory,
                                      Integer pageNumber, Integer pageSize) {
+        log.info("BeerService: getAllBeers()");
+
         PageRequest pageRequest = ServiceUtils.buildPageRequest(pageNumber, pageSize, Sort.by("beerName"));
         Page<Beer> beerPage;
 
