@@ -31,6 +31,8 @@
         <mapstruct.version>1.6.0</mapstruct.version>
         <springdoc.version>2.6.0</springdoc.version>
         <swagger.validator.version>2.42.0</swagger.validator.version>
+        <logbook.version>3.9.0</logbook.version>
+        <logstash.version>8.0</logstash.version>
     </properties>
     <dependencies>
         <dependency>
@@ -97,7 +99,21 @@
             <artifactId>springdoc-openapi-starter-common</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>logbook-spring-boot-starter</artifactId>
+            <version>${logbook.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>logbook-logstash</artifactId>
+            <version>${logbook.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logstash.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
