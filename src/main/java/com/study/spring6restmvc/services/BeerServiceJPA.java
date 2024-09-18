@@ -7,6 +7,8 @@ import com.study.spring6restmvc.model.BeerStyle;
 import com.study.spring6restmvc.repositories.BeerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
@@ -31,6 +33,7 @@ public class BeerServiceJPA implements BeerService {
 
     private final BeerRepository beerRepository;
     private final BeerMapper beerMapper;
+    private final CacheManager cacheManager;
 
     @Override
     @Cacheable(cacheNames = "beerCache", key = "#beerId")
@@ -69,6 +72,8 @@ public class BeerServiceJPA implements BeerService {
 
     @Override
     public BeerDTO saveBeer(BeerDTO beer) {
+        clearCache(null);
+
         return beerMapper.beerToBeerDTO(
                 beerRepository.save(
                         beerMapper.beerDtoToBeer(beer)));
@@ -76,6 +81,8 @@ public class BeerServiceJPA implements BeerService {
 
     @Override
     public Optional<BeerDTO> updateBeerById(UUID beerId, BeerDTO beer) {
+        clearCache(beerId);
+
         AtomicReference<BeerDTO> atomicReference = new AtomicReference<>();
 
         beerRepository.findById(beerId).ifPresentOrElse(
@@ -98,6 +105,8 @@ public class BeerServiceJPA implements BeerService {
 
     @Override
     public boolean deleteBeerById(UUID beerId) {
+        clearCache(beerId);
+
         if (beerRepository.existsById(beerId)) {
             beerRepository.deleteById(beerId);
             return true;
@@ -107,6 +116,8 @@ public class BeerServiceJPA implements BeerService {
 
     @Override
     public Optional<BeerDTO> patchBeerById(UUID beerId, BeerDTO beer) {
+        clearCache(beerId);
+
         AtomicReference<BeerDTO> atomicReference = new AtomicReference<>();
 
         beerRepository.findById(beerId).ifPresentOrElse(
@@ -145,5 +156,21 @@ public class BeerServiceJPA implements BeerService {
     private Page<Beer> getBeersByNameAndStyle(String beerName, BeerStyle beerStyle, Pageable pageable) {
         return beerRepository.findAllByBeerNameIsLikeIgnoreCaseAndBeerStyle(
                 "%" + beerName + "%", beerStyle, pageable);
+    }
+
+    private void clearCache(UUID beerId) {
+        Cache beerListCache = cacheManager.getCache("beerListCache");
+
+        if (beerListCache != null) {
+            beerListCache.clear();
+        }
+
+        if (beerId != null) {
+            Cache beerCache = cacheManager.getCache("beerCache");
+
+            if (beerCache != null) {
+                beerCache.evict(beerId);
+            }
+        }
     }
 }
