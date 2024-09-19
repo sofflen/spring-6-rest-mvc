@@ -38,9 +38,9 @@ public class Customer {
     @Version
     private Integer version;
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
     @UpdateTimestamp
-    @Column(updatable = false)
     private LocalDateTime updatedAt;
     @NotBlank
     @Size(max = 50)
