@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.config.JwtDecoderConfig;
 import com.study.spring6restmvc.entities.Beer;
 import com.study.spring6restmvc.events.BeerCreatedEvent;
+import com.study.spring6restmvc.events.BeerDeletedEvent;
+import com.study.spring6restmvc.events.BeerPatchedEvent;
+import com.study.spring6restmvc.events.BeerUpdatedEvent;
 import com.study.spring6restmvc.exceptions.NotFoundException;
 import com.study.spring6restmvc.mappers.BeerMapper;
 import com.study.spring6restmvc.model.BeerDTO;
@@ -39,9 +42,11 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -201,6 +206,7 @@ class BeerControllerIntegrationTest {
     }
 
     @Test
+    @Transactional
     void testCreateBeerMvc() throws Exception {
         var beerDto = BeerDTO.builder()
                 .beerName("Beer Name")
@@ -211,11 +217,11 @@ class BeerControllerIntegrationTest {
                 .build();
 
         mockMvc.perform(
-                post(BEER_PATH)
-                        .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(beerDto)))
+                        post(BEER_PATH)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(beerDto)))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists(HttpHeaders.LOCATION));
 
@@ -253,6 +259,26 @@ class BeerControllerIntegrationTest {
 
     @Test
     @Transactional
+    void testUpdateBeerMVC() throws Exception {
+        var beerDto = beerMapper.beerToBeerDTO(testBeer);
+        beerDto.setBeerName("updatedBeer");
+
+        mockMvc.perform(
+                        put(BEER_PATH_ID, testBeer.getId())
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(beerDto)))
+                .andExpect(status().isNoContent());
+
+
+        assertThat(testBeer.getBeerName()).isEqualTo(beerDto.getBeerName());
+        assertThat(applicationEvents.stream(BeerUpdatedEvent.class).count())
+                .isEqualTo(1);
+    }
+
+    @Test
+    @Transactional
     void testDeleteBeerById() {
         var beerId = testBeer.getId();
 
@@ -260,6 +286,21 @@ class BeerControllerIntegrationTest {
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
         assertThat(beerRepository.findById(beerId)).isEmpty();
+    }
+
+    @Test
+    @Transactional
+    void testDeleteBeerMVC() throws Exception {
+        var beerId = testBeer.getId();
+
+        mockMvc.perform(
+                        delete(BEER_PATH_ID, beerId)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE))
+                .andExpect(
+                        status().isNoContent());
+
+        assertThat(beerRepository.findById(beerId)).isEmpty();
+        assertThat(applicationEvents.stream(BeerDeletedEvent.class).count()).isEqualTo(1);
     }
 
     @Test
@@ -287,6 +328,26 @@ class BeerControllerIntegrationTest {
         var updatedBeer = beerRepository.findById(testBeer.getId()).orElseThrow();
 
         assertThat(updatedBeer.getBeerName()).isEqualTo(newBeerName);
+    }
+
+    @Test
+    @Transactional
+    void testPatchBeerMVC() throws Exception {
+        var beerDto = beerMapper.beerToBeerDTO(testBeer);
+        beerDto.setBeerName("patchedBeer");
+
+        mockMvc.perform(
+                        patch(BEER_PATH_ID, testBeer.getId())
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(beerDto)))
+                .andExpect(status().isNoContent());
+
+
+        assertThat(testBeer.getBeerName()).isEqualTo(beerDto.getBeerName());
+        assertThat(applicationEvents.stream(BeerPatchedEvent.class).count())
+                .isEqualTo(1);
     }
 
     @Test
