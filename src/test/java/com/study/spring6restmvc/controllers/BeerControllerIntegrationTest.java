@@ -3,6 +3,7 @@ package com.study.spring6restmvc.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.config.JwtDecoderConfig;
 import com.study.spring6restmvc.entities.Beer;
+import com.study.spring6restmvc.events.BeerCreatedEvent;
 import com.study.spring6restmvc.exceptions.NotFoundException;
 import com.study.spring6restmvc.mappers.BeerMapper;
 import com.study.spring6restmvc.model.BeerDTO;
@@ -13,13 +14,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -36,10 +41,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@RecordApplicationEvents
 @Import(JwtDecoderConfig.class)
 class BeerControllerIntegrationTest {
 
@@ -53,6 +61,8 @@ class BeerControllerIntegrationTest {
     private ObjectMapper objectMapper;
     @Autowired
     private WebApplicationContext wac;
+    @Autowired
+    ApplicationEvents applicationEvents;
 
     private Beer testBeer;
     private MockMvc mockMvc;
@@ -188,6 +198,29 @@ class BeerControllerIntegrationTest {
         var beerId = UUID.fromString(locationSplitStrArray[locationSplitStrArray.length - 1]);
 
         assertThat(beerRepository.findById(beerId)).isNotNull();
+    }
+
+    @Test
+    void testCreateBeerMvc() throws Exception {
+        var beerDto = BeerDTO.builder()
+                .beerName("Beer Name")
+                .beerStyle(BeerStyle.PALE_ALE)
+                .upc("123")
+                .price(new BigDecimal("11.11"))
+                .quantityOnHand(5)
+                .build();
+
+        mockMvc.perform(
+                post(BEER_PATH)
+                        .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(beerDto)))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists(HttpHeaders.LOCATION));
+
+        assertThat(applicationEvents.stream(BeerCreatedEvent.class).count())
+                .isEqualTo(1);
     }
 
     @Test

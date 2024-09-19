@@ -1,6 +1,7 @@
 package com.study.spring6restmvc.services;
 
 import com.study.spring6restmvc.entities.Beer;
+import com.study.spring6restmvc.events.BeerCreatedEvent;
 import com.study.spring6restmvc.mappers.BeerMapper;
 import com.study.spring6restmvc.model.BeerDTO;
 import com.study.spring6restmvc.model.BeerStyle;
@@ -10,11 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -34,6 +37,7 @@ public class BeerServiceJPA implements BeerService {
     private final BeerRepository beerRepository;
     private final BeerMapper beerMapper;
     private final CacheManager cacheManager;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Cacheable(cacheNames = "beerCache", key = "#beerId")
@@ -74,9 +78,13 @@ public class BeerServiceJPA implements BeerService {
     public BeerDTO saveBeer(BeerDTO beer) {
         clearCache(null);
 
-        return beerMapper.beerToBeerDTO(
-                beerRepository.save(
-                        beerMapper.beerDtoToBeer(beer)));
+        var mappedBeer = beerMapper.beerDtoToBeer(beer);
+        var savedBeer = beerRepository.save(mappedBeer);
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        eventPublisher.publishEvent(new BeerCreatedEvent(savedBeer, authentication));
+
+        return beerMapper.beerToBeerDTO(savedBeer);
     }
 
     @Override
