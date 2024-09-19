@@ -3,10 +3,12 @@ package com.study.spring6restmvc.mappers;
 import com.study.spring6restmvc.entities.Customer;
 import com.study.spring6restmvc.model.CustomerDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper
 public interface CustomerMapper {
 
+    @Mapping(target = "beerOrders", ignore = true)
     Customer customerDtoToCustomer(CustomerDTO dto);
 
     CustomerDTO customerToCustomerDTO(Customer customer);

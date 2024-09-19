@@ -18,4 +18,5 @@ public class CustomerDTO {
     @NotBlank
     @Size(max = 50)
     private String customerName;
+    private String email;
 }
