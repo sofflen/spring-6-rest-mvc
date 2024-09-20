@@ -1,4 +1,4 @@
-package com.study.spring6restmvc.events;
+package com.study.spring6restmvc.events.beer;
 
 import com.study.spring6restmvc.entities.Beer;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import org.springframework.security.core.Authentication;
 @Setter
 @AllArgsConstructor
 @Builder
-public class BeerDeletedEvent implements BeerEvent {
+public class BeerUpdatedEvent implements BeerEvent {
     private Beer beer;
     private Authentication authentication;
 }

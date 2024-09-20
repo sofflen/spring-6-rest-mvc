@@ -1,6 +1,6 @@
-package com.study.spring6restmvc.events;
+package com.study.spring6restmvc.events.customer;
 
-import com.study.spring6restmvc.entities.Beer;
+import com.study.spring6restmvc.entities.Customer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import org.springframework.security.core.Authentication;
 @Setter
 @AllArgsConstructor
 @Builder
-public class BeerUpdatedEvent implements BeerEvent {
-    private Beer beer;
+public class CustomerPatchedEvent implements CustomerEvent {
+    private Customer customer;
     private Authentication authentication;
 }

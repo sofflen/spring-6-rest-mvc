@@ -3,10 +3,10 @@ package com.study.spring6restmvc.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.config.JwtDecoderConfig;
 import com.study.spring6restmvc.entities.Beer;
-import com.study.spring6restmvc.events.BeerCreatedEvent;
-import com.study.spring6restmvc.events.BeerDeletedEvent;
-import com.study.spring6restmvc.events.BeerPatchedEvent;
-import com.study.spring6restmvc.events.BeerUpdatedEvent;
+import com.study.spring6restmvc.events.beer.BeerCreatedEvent;
+import com.study.spring6restmvc.events.beer.BeerDeletedEvent;
+import com.study.spring6restmvc.events.beer.BeerPatchedEvent;
+import com.study.spring6restmvc.events.beer.BeerUpdatedEvent;
 import com.study.spring6restmvc.exceptions.NotFoundException;
 import com.study.spring6restmvc.mappers.BeerMapper;
 import com.study.spring6restmvc.model.BeerDTO;
@@ -67,7 +67,7 @@ class BeerControllerIntegrationTest {
     @Autowired
     private WebApplicationContext wac;
     @Autowired
-    ApplicationEvents applicationEvents;
+    private ApplicationEvents applicationEvents;
 
     private Beer testBeer;
     private MockMvc mockMvc;

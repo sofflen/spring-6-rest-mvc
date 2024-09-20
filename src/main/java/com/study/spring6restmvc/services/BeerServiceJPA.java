@@ -1,10 +1,10 @@
 package com.study.spring6restmvc.services;
 
 import com.study.spring6restmvc.entities.Beer;
-import com.study.spring6restmvc.events.BeerCreatedEvent;
-import com.study.spring6restmvc.events.BeerDeletedEvent;
-import com.study.spring6restmvc.events.BeerPatchedEvent;
-import com.study.spring6restmvc.events.BeerUpdatedEvent;
+import com.study.spring6restmvc.events.beer.BeerCreatedEvent;
+import com.study.spring6restmvc.events.beer.BeerDeletedEvent;
+import com.study.spring6restmvc.events.beer.BeerPatchedEvent;
+import com.study.spring6restmvc.events.beer.BeerUpdatedEvent;
 import com.study.spring6restmvc.mappers.BeerMapper;
 import com.study.spring6restmvc.model.BeerDTO;
 import com.study.spring6restmvc.model.BeerStyle;

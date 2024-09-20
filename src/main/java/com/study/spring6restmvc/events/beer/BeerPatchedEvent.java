@@ -1,4 +1,4 @@
-package com.study.spring6restmvc.events;
+package com.study.spring6restmvc.events.beer;
 
 import com.study.spring6restmvc.entities.Beer;
 import lombok.AllArgsConstructor;

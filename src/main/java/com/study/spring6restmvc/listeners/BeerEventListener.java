@@ -1,10 +1,10 @@
 package com.study.spring6restmvc.listeners;
 
-import com.study.spring6restmvc.events.BeerCreatedEvent;
-import com.study.spring6restmvc.events.BeerDeletedEvent;
-import com.study.spring6restmvc.events.BeerEvent;
-import com.study.spring6restmvc.events.BeerPatchedEvent;
-import com.study.spring6restmvc.events.BeerUpdatedEvent;
+import com.study.spring6restmvc.events.beer.BeerCreatedEvent;
+import com.study.spring6restmvc.events.beer.BeerDeletedEvent;
+import com.study.spring6restmvc.events.beer.BeerEvent;
+import com.study.spring6restmvc.events.beer.BeerPatchedEvent;
+import com.study.spring6restmvc.events.beer.BeerUpdatedEvent;
 import com.study.spring6restmvc.mappers.BeerMapper;
 import com.study.spring6restmvc.repositories.BeerAuditRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +13,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import static com.study.spring6restmvc.listeners.BeerEventTypes.BEER_CREATED;
-import static com.study.spring6restmvc.listeners.BeerEventTypes.BEER_DELETED;
-import static com.study.spring6restmvc.listeners.BeerEventTypes.BEER_PATCHED;
-import static com.study.spring6restmvc.listeners.BeerEventTypes.BEER_UPDATED;
+import static com.study.spring6restmvc.listeners.EventTypes.CREATED;
+import static com.study.spring6restmvc.listeners.EventTypes.DELETED;
+import static com.study.spring6restmvc.listeners.EventTypes.PATCHED;
+import static com.study.spring6restmvc.listeners.EventTypes.UPDATED;
 
 @Component
 @Slf4j
@@ -32,10 +32,10 @@ public class BeerEventListener {
         String auditEventType;
 
         switch (event) {
-            case BeerCreatedEvent ignored -> auditEventType = BEER_CREATED.name();
-            case BeerUpdatedEvent ignored -> auditEventType = BEER_UPDATED.name();
-            case BeerDeletedEvent ignored -> auditEventType = BEER_DELETED.name();
-            case BeerPatchedEvent ignored -> auditEventType = BEER_PATCHED.name();
+            case BeerCreatedEvent ignored -> auditEventType = CREATED.name();
+            case BeerUpdatedEvent ignored -> auditEventType = UPDATED.name();
+            case BeerDeletedEvent ignored -> auditEventType = DELETED.name();
+            case BeerPatchedEvent ignored -> auditEventType = PATCHED.name();
             default -> auditEventType = "UNKNOWN";
         }
 
@@ -47,6 +47,6 @@ public class BeerEventListener {
         }
 
         var savedBeerAudit = beerAuditRepository.save(beerAudit);
-        log.debug("{} Audit saved: id {}", auditEventType, savedBeerAudit.getAuditId());
+        log.debug("{} Beer Audit saved: id {}", auditEventType, savedBeerAudit.getAuditId());
     }
 }
