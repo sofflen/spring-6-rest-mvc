@@ -1,6 +1,10 @@
 package com.study.spring6restmvc.services;
 
 import com.study.spring6restmvc.entities.Customer;
+import com.study.spring6restmvc.events.customer.CustomerCreatedEvent;
+import com.study.spring6restmvc.events.customer.CustomerDeletedEvent;
+import com.study.spring6restmvc.events.customer.CustomerPatchedEvent;
+import com.study.spring6restmvc.events.customer.CustomerUpdatedEvent;
 import com.study.spring6restmvc.mappers.CustomerMapper;
 import com.study.spring6restmvc.model.CustomerDTO;
 import com.study.spring6restmvc.repositories.CustomerRepository;
@@ -9,11 +13,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -33,6 +39,7 @@ public class CustomerServiceJPA implements CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
     private final CacheManager cacheManager;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Cacheable(cacheNames = "customerCache")
@@ -45,7 +52,7 @@ public class CustomerServiceJPA implements CustomerService {
     }
 
     @Override
-    @Cacheable(cacheNames = "customerListCache", condition = "pageNumber == null || pageSize == null")
+    @Cacheable(cacheNames = "customerListCache", condition = "#pageNumber == null || #pageSize == null")
     public Page<CustomerDTO> getAllCustomers(String customerName, String email, Integer pageNumber, Integer pageSize) {
         log.info("CustomerService: getAllCustomers");
 
@@ -68,9 +75,14 @@ public class CustomerServiceJPA implements CustomerService {
     @Override
     public CustomerDTO saveCustomer(CustomerDTO customer) {
         clearCache(null);
-        return customerMapper.customerToCustomerDTO(
-                customerRepository.save(
-                        customerMapper.customerDtoToCustomer(customer)));
+
+        var mappedCustomer = customerMapper.customerDtoToCustomer(customer);
+        var savedCustomer = customerRepository.save(mappedCustomer);
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        eventPublisher.publishEvent(new CustomerCreatedEvent(savedCustomer, authentication));
+
+        return customerMapper.customerToCustomerDTO(savedCustomer);
     }
 
     @Override
@@ -86,9 +98,13 @@ public class CustomerServiceJPA implements CustomerService {
                     }
                     foundCustomer.setUpdatedAt(LocalDateTime.now());
 
+                    var updatedCustomer = customerRepository.save(foundCustomer);
+                    var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+                    eventPublisher.publishEvent(new CustomerUpdatedEvent(updatedCustomer, authentication));
+
                     atomicReference.set(
-                            customerMapper.customerToCustomerDTO(
-                                    customerRepository.save(foundCustomer)));
+                            customerMapper.customerToCustomerDTO(updatedCustomer));
                 },
                 () -> atomicReference.set(null));
 
@@ -98,8 +114,11 @@ public class CustomerServiceJPA implements CustomerService {
     @Override
     public boolean deleteCustomerById(UUID customerId) {
         if (customerRepository.existsById(customerId)) {
+            var authentication = SecurityContextHolder.getContext().getAuthentication();
+
             clearCache(customerId);
             customerRepository.deleteById(customerId);
+            eventPublisher.publishEvent(new CustomerDeletedEvent(Customer.builder().id(customerId).build(), authentication));
             return true;
         }
         return false;
@@ -118,9 +137,13 @@ public class CustomerServiceJPA implements CustomerService {
                     }
                     foundCustomer.setUpdatedAt(LocalDateTime.now());
 
+                    var patchedCustomer = customerRepository.save(foundCustomer);
+                    var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+                    eventPublisher.publishEvent(new CustomerPatchedEvent(patchedCustomer, authentication));
+
                     atomicReference.set(
-                            customerMapper.customerToCustomerDTO(
-                                    customerRepository.save(foundCustomer)));
+                            customerMapper.customerToCustomerDTO(patchedCustomer));
                 },
                 () -> atomicReference.set(null));
 

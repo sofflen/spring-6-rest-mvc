@@ -3,6 +3,10 @@ package com.study.spring6restmvc.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.config.JwtDecoderConfig;
 import com.study.spring6restmvc.entities.Customer;
+import com.study.spring6restmvc.events.customer.CustomerCreatedEvent;
+import com.study.spring6restmvc.events.customer.CustomerDeletedEvent;
+import com.study.spring6restmvc.events.customer.CustomerPatchedEvent;
+import com.study.spring6restmvc.events.customer.CustomerUpdatedEvent;
 import com.study.spring6restmvc.exceptions.NotFoundException;
 import com.study.spring6restmvc.mappers.CustomerMapper;
 import com.study.spring6restmvc.model.CustomerDTO;
@@ -12,8 +16,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,12 +38,17 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.number.OrderingComparison.greaterThan;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@RecordApplicationEvents
 @Import(JwtDecoderConfig.class)
 class CustomerControllerIntegrationTest {
 
@@ -50,6 +62,8 @@ class CustomerControllerIntegrationTest {
     private ObjectMapper objectMapper;
     @Autowired
     private WebApplicationContext wac;
+    @Autowired
+    private ApplicationEvents applicationEvents;
 
     private Customer testCustomer;
     private MockMvc mockMvc;
@@ -168,6 +182,27 @@ class CustomerControllerIntegrationTest {
     }
 
     @Test
+    @Transactional
+    void testCreateCustomerMvc() throws Exception {
+        var customerDto = CustomerDTO.builder()
+                .customerName("Customer Name")
+                .email("customer@test.com")
+                .build();
+
+        mockMvc.perform(
+                        post(CUSTOMER_PATH)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(customerDto)))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists(HttpHeaders.LOCATION));
+
+        assertThat(applicationEvents.stream(CustomerCreatedEvent.class).count())
+                .isEqualTo(1);
+    }
+
+    @Test
     void testUpdateCustomerThrowsNotFoundExceptionIfCustomerDoesNotExist() {
         var randomUuid = UUID.randomUUID();
         var customerDto = CustomerDTO.builder().build();
@@ -197,6 +232,26 @@ class CustomerControllerIntegrationTest {
 
     @Test
     @Transactional
+    void testUpdateBeerMVC() throws Exception {
+        var customerDto = customerMapper.customerToCustomerDTO(testCustomer);
+        customerDto.setCustomerName("Updated Customer");
+
+        mockMvc.perform(
+                        put(CUSTOMER_PATH_ID, testCustomer.getId())
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(customerDto)))
+                .andExpect(status().isNoContent());
+
+
+        assertThat(testCustomer.getCustomerName()).isEqualTo(customerDto.getCustomerName());
+        assertThat(applicationEvents.stream(CustomerUpdatedEvent.class).count())
+                .isEqualTo(1);
+    }
+
+    @Test
+    @Transactional
     void testDeleteCustomerById() {
         var customerId = testCustomer.getId();
 
@@ -204,6 +259,21 @@ class CustomerControllerIntegrationTest {
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
         assertThat(customerRepository.findById(customerId)).isEmpty();
+    }
+
+    @Test
+    @Transactional
+    void testDeleteBeerMVC() throws Exception {
+        var customerId = testCustomer.getId();
+
+        mockMvc.perform(
+                        delete(CUSTOMER_PATH_ID, customerId)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE))
+                .andExpect(
+                        status().isNoContent());
+
+        assertThat(customerRepository.findById(customerId)).isEmpty();
+        assertThat(applicationEvents.stream(CustomerDeletedEvent.class).count()).isEqualTo(1);
     }
 
     @Test
@@ -231,6 +301,26 @@ class CustomerControllerIntegrationTest {
         var updatedCustomer = customerRepository.findById(testCustomer.getId()).orElseThrow();
 
         assertThat(updatedCustomer.getCustomerName()).isEqualTo(newCustomerName);
+    }
+
+    @Test
+    @Transactional
+    void testPatchCustomerMVC() throws Exception {
+        var customerDto = customerMapper.customerToCustomerDTO(testCustomer);
+        customerDto.setCustomerName("Patched Beer");
+
+        mockMvc.perform(
+                        patch(CUSTOMER_PATH_ID, testCustomer.getId())
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(customerDto)))
+                .andExpect(status().isNoContent());
+
+
+        assertThat(testCustomer.getCustomerName()).isEqualTo(customerDto.getCustomerName());
+        assertThat(applicationEvents.stream(CustomerPatchedEvent.class).count())
+                .isEqualTo(1);
     }
 
     @Test
