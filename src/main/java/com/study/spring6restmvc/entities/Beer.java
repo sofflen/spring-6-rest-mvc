@@ -61,7 +61,8 @@ public class Beer {
     @DecimalMin(value = "0.00", inclusive = false)
     private BigDecimal price;
     @OneToMany(mappedBy = "beer")
-    private Set<BeerOrderLine> beerOrderLines;
+    @Builder.Default
+    private Set<BeerOrderLine> beerOrderLines = new HashSet<>();
     @ManyToMany(mappedBy = "beers")
     @Builder.Default
     private Set<Category> categories = new HashSet<>();
