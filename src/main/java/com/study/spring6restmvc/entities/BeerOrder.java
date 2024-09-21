@@ -32,10 +32,11 @@ public class BeerOrder {
     private LocalDateTime updatedAt;
     private String customerRef;
     @ManyToOne
+    @JoinColumn(name = "customer_id")
     private Customer customer;
     @OneToMany(mappedBy = "beerOrder")
     private Set<BeerOrderLine> beerOrderLines;
-    @OneToOne(mappedBy = "beerOrder", cascade = CascadeType.PERSIST)
+    @OneToOne
     @JoinColumn(name = "beer_order_shipment_id")
     private BeerOrderShipment beerOrderShipment;
 

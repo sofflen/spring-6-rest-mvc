@@ -1,10 +1,10 @@
 package com.study.spring6restmvc.entities;
 
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
@@ -41,7 +41,6 @@ public class BeerOrderShipment {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
     private String trackingNumber;
-    @OneToOne
-    @JoinColumn(name = "beer_order_id")
+    @OneToOne(mappedBy = "beerOrderShipment", cascade = CascadeType.PERSIST)
     private BeerOrder beerOrder;
 }
