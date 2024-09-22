@@ -5,6 +5,7 @@ import com.study.spring6restmvc.config.JwtDecoderConfig;
 import com.study.spring6restmvc.entities.BeerOrder;
 import com.study.spring6restmvc.exceptions.NotFoundException;
 import com.study.spring6restmvc.mappers.BeerOrderMapper;
+import com.study.spring6restmvc.model.BeerOrderCreateDTO;
 import com.study.spring6restmvc.repositories.BeerOrderRepository;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,9 +13,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.UUID;
@@ -28,7 +32,9 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -92,7 +98,7 @@ class BeerOrderControllerIntegrationTest {
     }
 
     @Test
-    void testGetBeerOrderByIdMVC() throws Exception {
+    void testGetBeerOrderByIdMvc() throws Exception {
         var beerOrderId = testBeerOrder.getId();
 
         mockMvc.perform(
@@ -102,5 +108,49 @@ class BeerOrderControllerIntegrationTest {
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
                         jsonPath("$.id", is(beerOrderId.toString())));
+    }
+
+    @Test
+    @Transactional
+    void testCreateBeerOrder() {
+        var beerOrderCreateDto = BeerOrderCreateDTO.builder()
+                .customerId(testBeerOrder.getCustomer().getId())
+                .build();
+
+        var responseEntity = beerOrderController.createBeerOrder(beerOrderCreateDto);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(201));
+        assertThat(responseEntity.getHeaders().getLocation()).isNotNull();
+
+        var locationSplitStrArray = responseEntity.getHeaders().getLocation().toString().split("/");
+        var beerOrderId = UUID.fromString(locationSplitStrArray[locationSplitStrArray.length - 1]);
+
+        assertThat(beerOrderRepository.findById(beerOrderId)).isNotNull();
+    }
+
+    @Test
+    void testCreateBeerOrderThrowsNotFoundExceptionIfCustomerDoesNotExist() {
+        var beerOrderCreateDto = BeerOrderCreateDTO.builder()
+                .customerId(UUID.randomUUID())
+                .build();
+
+        assertThrows(NotFoundException.class, () -> beerOrderController.createBeerOrder(beerOrderCreateDto));
+    }
+
+    @Test
+    @Transactional
+    void testCreateBeerOrderMvc() throws Exception {
+        var beerOrderCreateDto = BeerOrderCreateDTO.builder()
+                .customerId(testBeerOrder.getCustomer().getId())
+                .build();
+
+        mockMvc.perform(
+                        post(BEER_ORDER_PATH)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(beerOrderCreateDto)))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists(HttpHeaders.LOCATION));
     }
 }
