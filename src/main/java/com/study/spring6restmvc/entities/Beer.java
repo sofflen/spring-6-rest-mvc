@@ -1,6 +1,7 @@
 package com.study.spring6restmvc.entities;
 
 import com.study.spring6restmvc.model.BeerStyle;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -60,7 +61,7 @@ public class Beer {
     @NotNull
     @DecimalMin(value = "0.00", inclusive = false)
     private BigDecimal price;
-    @OneToMany(mappedBy = "beer")
+    @OneToMany(mappedBy = "beer", cascade = CascadeType.REMOVE)
     @Builder.Default
     private Set<BeerOrderLine> beerOrderLines = new HashSet<>();
     @ManyToMany(mappedBy = "beers")

@@ -1,7 +1,6 @@
 package com.study.spring6restmvc.entities;
 
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -43,6 +42,6 @@ public class BeerOrderShipment {
     private LocalDateTime updatedAt;
     @NotBlank
     private String trackingNumber;
-    @OneToOne(mappedBy = "beerOrderShipment", cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = "beerOrderShipment")
     private BeerOrder beerOrder;
 }
