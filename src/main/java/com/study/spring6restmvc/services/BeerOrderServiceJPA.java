@@ -137,4 +137,13 @@ public class BeerOrderServiceJPA implements BeerOrderService {
 
         return Optional.ofNullable(atomicReference.get());
     }
+
+    @Override
+    public boolean deleteById(UUID beerOrderId) {
+        if (beerOrderRepository.existsById(beerOrderId)) {
+            beerOrderRepository.deleteById(beerOrderId);
+            return true;
+        }
+        return false;
+    }
 }

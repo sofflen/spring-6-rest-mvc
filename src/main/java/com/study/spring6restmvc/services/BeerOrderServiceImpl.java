@@ -85,4 +85,10 @@ public class BeerOrderServiceImpl implements BeerOrderService {
 
         return Optional.of(existingBeerOrder);
     }
+
+    @Override
+    public boolean deleteById(UUID beerOrderId) {
+        beerOrdersMap.remove(beerOrderId);
+        return true;
+    }
 }
