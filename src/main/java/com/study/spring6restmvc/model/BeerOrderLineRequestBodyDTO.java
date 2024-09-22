@@ -9,9 +9,10 @@ import java.util.UUID;
 
 @Builder
 @Data
-public class BeerOrderLineCreateDTO {
+public class BeerOrderLineRequestBodyDTO {
     @Min(value = 1, message = "Quantity must be more than 0")
     private Integer orderQuantity;
+    private Integer quantityAllocated;
     @NotNull
     private UUID beerId;
     private UUID beerOrderId;

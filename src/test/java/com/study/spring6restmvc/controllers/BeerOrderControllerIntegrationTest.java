@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.config.JwtDecoderConfig;
 import com.study.spring6restmvc.entities.BeerOrder;
 import com.study.spring6restmvc.exceptions.NotFoundException;
-import com.study.spring6restmvc.mappers.BeerOrderMapper;
-import com.study.spring6restmvc.model.BeerOrderCreateDTO;
+import com.study.spring6restmvc.model.BeerOrderRequestBodyDTO;
 import com.study.spring6restmvc.repositories.BeerOrderRepository;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,8 +45,6 @@ class BeerOrderControllerIntegrationTest {
     private BeerOrderController beerOrderController;
     @Autowired
     private BeerOrderRepository beerOrderRepository;
-    @Autowired
-    private BeerOrderMapper beerOrderMapper;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -113,7 +110,7 @@ class BeerOrderControllerIntegrationTest {
     @Test
     @Transactional
     void testCreateBeerOrder() {
-        var beerOrderCreateDto = BeerOrderCreateDTO.builder()
+        var beerOrderCreateDto = BeerOrderRequestBodyDTO.builder()
                 .customerId(testBeerOrder.getCustomer().getId())
                 .build();
 
@@ -130,7 +127,7 @@ class BeerOrderControllerIntegrationTest {
 
     @Test
     void testCreateBeerOrderThrowsNotFoundExceptionIfCustomerDoesNotExist() {
-        var beerOrderCreateDto = BeerOrderCreateDTO.builder()
+        var beerOrderCreateDto = BeerOrderRequestBodyDTO.builder()
                 .customerId(UUID.randomUUID())
                 .build();
 
@@ -140,7 +137,7 @@ class BeerOrderControllerIntegrationTest {
     @Test
     @Transactional
     void testCreateBeerOrderMvc() throws Exception {
-        var beerOrderCreateDto = BeerOrderCreateDTO.builder()
+        var beerOrderCreateDto = BeerOrderRequestBodyDTO.builder()
                 .customerId(testBeerOrder.getCustomer().getId())
                 .build();
 

@@ -4,7 +4,7 @@ import com.study.spring6restmvc.entities.BeerOrder;
 import com.study.spring6restmvc.entities.BeerOrderLine;
 import com.study.spring6restmvc.exceptions.NotFoundException;
 import com.study.spring6restmvc.mappers.BeerOrderMapper;
-import com.study.spring6restmvc.model.BeerOrderCreateDTO;
+import com.study.spring6restmvc.model.BeerOrderRequestBodyDTO;
 import com.study.spring6restmvc.model.BeerOrderDTO;
 import com.study.spring6restmvc.repositories.BeerOrderRepository;
 import com.study.spring6restmvc.repositories.BeerRepository;
@@ -52,7 +52,7 @@ public class BeerOrderServiceJPA implements BeerOrderService {
     }
 
     @Override
-    public BeerOrderDTO save(BeerOrderCreateDTO beerOrderCreateDTO) throws NotFoundException {
+    public BeerOrderDTO save(BeerOrderRequestBodyDTO beerOrderCreateDTO) throws NotFoundException {
         log.info("BeerOrderService: save({})", beerOrderCreateDTO);
         var customer = customerRepository
                 .findById(beerOrderCreateDTO.getCustomerId())

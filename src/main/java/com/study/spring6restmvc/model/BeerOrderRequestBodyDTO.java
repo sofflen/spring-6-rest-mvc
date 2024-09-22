@@ -9,9 +9,10 @@ import java.util.UUID;
 
 @Builder
 @Data
-public class BeerOrderCreateDTO {
+public class BeerOrderRequestBodyDTO {
     private String customerRef;
     @NotNull
     private UUID customerId;
-    private Set<BeerOrderLineCreateDTO> orderLines;
+    private Set<BeerOrderLineRequestBodyDTO> orderLines;
+    private BeerOrderShipmentDTO beerOrderShipment;
 }

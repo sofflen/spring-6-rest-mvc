@@ -1,7 +1,7 @@
 package com.study.spring6restmvc.controllers;
 
 import com.study.spring6restmvc.exceptions.NotFoundException;
-import com.study.spring6restmvc.model.BeerOrderCreateDTO;
+import com.study.spring6restmvc.model.BeerOrderRequestBodyDTO;
 import com.study.spring6restmvc.model.BeerOrderDTO;
 import com.study.spring6restmvc.services.BeerOrderService;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +52,7 @@ public class BeerOrderController {
     }
 
     @PostMapping(BEER_ORDER_PATH)
-    public ResponseEntity<BeerOrderDTO> createBeerOrder(@Validated @RequestBody BeerOrderCreateDTO beerOrder) {
+    public ResponseEntity<BeerOrderDTO> createBeerOrder(@Validated @RequestBody BeerOrderRequestBodyDTO beerOrder) {
         log.info("BeerOrderController: createBeerOrder({})", beerOrder);
 
         BeerOrderDTO savedBeerOrder = beerOrderService.save(beerOrder);

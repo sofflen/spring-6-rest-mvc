@@ -1,6 +1,6 @@
 package com.study.spring6restmvc.services;
 
-import com.study.spring6restmvc.model.BeerOrderCreateDTO;
+import com.study.spring6restmvc.model.BeerOrderRequestBodyDTO;
 import com.study.spring6restmvc.model.BeerOrderDTO;
 import com.study.spring6restmvc.model.CustomerDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,7 @@ public class BeerOrderServiceImpl implements BeerOrderService {
     }
 
     @Override
-    public BeerOrderDTO save(BeerOrderCreateDTO beerOrderCreateDTO) {
+    public BeerOrderDTO save(BeerOrderRequestBodyDTO beerOrderCreateDTO) {
         var beerOrderDto = BeerOrderDTO.builder()
                 .id(UUID.randomUUID())
                 .version(0)

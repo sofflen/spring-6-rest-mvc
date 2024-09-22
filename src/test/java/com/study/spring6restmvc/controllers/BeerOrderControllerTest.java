@@ -2,17 +2,13 @@ package com.study.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.config.JwtDecoderMockConfig;
-import com.study.spring6restmvc.model.BeerOrderCreateDTO;
+import com.study.spring6restmvc.model.BeerOrderRequestBodyDTO;
 import com.study.spring6restmvc.model.BeerOrderDTO;
-import com.study.spring6restmvc.model.CustomerDTO;
 import com.study.spring6restmvc.services.BeerOrderService;
 import com.study.spring6restmvc.services.BeerOrderServiceImpl;
-import com.study.spring6restmvc.services.CustomerService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -50,13 +46,6 @@ class BeerOrderControllerTest {
 
     @MockBean
     private BeerOrderService beerOrderService;
-    @MockBean
-    private CustomerService customerService;
-
-    @Captor
-    private ArgumentCaptor<UUID> uuidArgumentCaptor;
-    @Captor
-    private ArgumentCaptor<CustomerDTO> customerArgumentCaptor;
 
     private BeerOrderServiceImpl beerOrderServiceImpl;
     private BeerOrderDTO testBeerOrderDto;
@@ -117,11 +106,11 @@ class BeerOrderControllerTest {
 
     @Test
     void testCreateBeerOrder() throws Exception {
-        var beerOrderCreateDto = BeerOrderCreateDTO.builder()
+        var beerOrderCreateDto = BeerOrderRequestBodyDTO.builder()
                 .customerId(UUID.randomUUID())
                 .build();
 
-        given(beerOrderService.save(any(BeerOrderCreateDTO.class))).willReturn(testBeerOrderDto);
+        given(beerOrderService.save(any(BeerOrderRequestBodyDTO.class))).willReturn(testBeerOrderDto);
 
         mockMvc.perform(
                         post(BEER_ORDER_PATH)
@@ -134,6 +123,6 @@ class BeerOrderControllerTest {
                         header().exists("Location"),
                         redirectedUrlTemplate(BEER_ORDER_ID_PATH, testBeerOrderDto.getId()));
 
-        verify(beerOrderService).save(any(BeerOrderCreateDTO.class));
+        verify(beerOrderService).save(any(BeerOrderRequestBodyDTO.class));
     }
 }
