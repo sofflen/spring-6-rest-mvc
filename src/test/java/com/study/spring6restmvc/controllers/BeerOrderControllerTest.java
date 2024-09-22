@@ -33,6 +33,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -156,6 +157,22 @@ class BeerOrderControllerTest {
                         status().isNoContent());
 
         verify(beerOrderService).updateById(uuidArgumentCaptor.capture(), eq(testBeerOrderUpdateDto));
+
+        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(testBeerOrderDto.getId());
+    }
+
+    @Test
+    void deleteBeerOrder() throws Exception {
+        given(beerOrderService.deleteById(any(UUID.class))).willReturn(true);
+
+        mockMvc.perform(
+                        delete(BEER_ORDER_ID_PATH, testBeerOrderDto.getId())
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(
+                        status().isNoContent());
+
+        verify(beerOrderService).deleteById(uuidArgumentCaptor.capture());
 
         assertThat(uuidArgumentCaptor.getValue()).isEqualTo(testBeerOrderDto.getId());
     }

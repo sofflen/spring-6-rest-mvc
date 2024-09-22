@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -179,7 +180,7 @@ class BeerOrderControllerIntegrationTest {
 
     @Test
     @Transactional
-    void testUpdateBeerMVC() throws Exception {
+    void testUpdateBeerMvc() throws Exception {
         var beerOrderUpdateDto = BeerOrderRequestBodyDTO.builder()
                 .customerId(testBeerOrder.getCustomer().getId())
                 .beerOrderShipment(beerOrderShipmentMapper
@@ -198,5 +199,30 @@ class BeerOrderControllerIntegrationTest {
                 .andExpect(status().isNoContent());
 
         assertThat(testBeerOrder.getCustomerRef()).isEqualTo(beerOrderUpdateDto.getCustomerRef());
+    }
+
+    @Test
+    @Transactional
+    void testDeleteBeerById() {
+        var beerOrderId = testBeerOrder.getId();
+
+        var responseEntity = beerOrderController.deleteBeerOrderById(beerOrderId);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
+        assertThat(beerOrderRepository.findById(beerOrderId)).isEmpty();
+    }
+
+    @Test
+    @Transactional
+    void testDeleteBeerMvc() throws Exception {
+        var beerOrderId = testBeerOrder.getId();
+
+        mockMvc.perform(
+                        delete(BEER_ORDER_ID_PATH, beerOrderId)
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE))
+                .andExpect(
+                        status().isNoContent());
+
+        assertThat(beerOrderRepository.findById(beerOrderId)).isEmpty();
     }
 }
