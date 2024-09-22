@@ -1,0 +1,49 @@
+package com.study.spring6restmvc.services;
+
+import com.study.spring6restmvc.model.BeerOrderDTO;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+@Slf4j
+public class BeerOrderServiceImpl implements BeerOrderService {
+
+    private final Map<UUID, BeerOrderDTO> beerOrdersMap = new HashMap<>();
+
+    public BeerOrderServiceImpl() {
+        BeerOrderDTO beerOrder1 = BeerOrderDTO.builder()
+                .id(UUID.randomUUID())
+                .version(0)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        BeerOrderDTO beerOrder2 = BeerOrderDTO.builder()
+                .id(UUID.randomUUID())
+                .version(0)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        beerOrdersMap.put(beerOrder1.getId(), beerOrder1);
+        beerOrdersMap.put(beerOrder2.getId(), beerOrder2);
+    }
+
+    @Override
+    public Optional<BeerOrderDTO> getById(UUID beerOrderId) {
+        return Optional.ofNullable(beerOrdersMap.get(beerOrderId));
+    }
+
+    @Override
+    public Page<BeerOrderDTO> getAll(Integer pageNumber, Integer pageSize) {
+        return new PageImpl<>(new ArrayList<>(beerOrdersMap.values()));
+    }
+}
