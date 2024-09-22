@@ -22,7 +22,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     public static final String CUSTOMER_PATH = "/api/v1/customer";
-    public static final String CUSTOMER_PATH_ID = "/api/v1/customer/{id}";
+    public static final String CUSTOMER_ID_PATH = CUSTOMER_PATH + "/{id}";
 
     @GetMapping(CUSTOMER_PATH)
     public PagedModel<CustomerDTO> getAllCustomers(@RequestParam(required = false) String customerName,
@@ -37,7 +37,7 @@ public class CustomerController {
         return new PagedModel<>(customerPage);
     }
 
-    @GetMapping(CUSTOMER_PATH_ID)
+    @GetMapping(CUSTOMER_ID_PATH)
     public CustomerDTO getCustomerById(@PathVariable("id") UUID customerId) {
         log.info("CustomerController: getCustomerById({})", customerId);
 
@@ -57,7 +57,7 @@ public class CustomerController {
         return new ResponseEntity<>(savedCustomer, headers, HttpStatus.CREATED);
     }
 
-    @PutMapping(CUSTOMER_PATH_ID)
+    @PutMapping(CUSTOMER_ID_PATH)
     public ResponseEntity<CustomerDTO> updateCustomerById(@PathVariable("id") UUID id,
                                                           @Validated @RequestBody CustomerDTO customer) {
         log.info("CustomerController: updateCustomerById({})", id);
@@ -69,7 +69,7 @@ public class CustomerController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping(CUSTOMER_PATH_ID)
+    @DeleteMapping(CUSTOMER_ID_PATH)
     public ResponseEntity<CustomerDTO> deleteCustomerById(@PathVariable("id") UUID customerId) {
         log.info("CustomerController: deleteCustomerById({})", customerId);
 
@@ -80,7 +80,7 @@ public class CustomerController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PatchMapping(CUSTOMER_PATH_ID)
+    @PatchMapping(CUSTOMER_ID_PATH)
     public ResponseEntity<CustomerDTO> patchCustomerById(@PathVariable("id") UUID customerId,
                                                          @RequestBody CustomerDTO customer) {
         log.info("CustomerController: patchCustomerById({})", customerId);

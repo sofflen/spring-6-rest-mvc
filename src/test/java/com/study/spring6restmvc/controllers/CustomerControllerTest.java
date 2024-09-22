@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_PATH;
-import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_PATH_ID;
+import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_ID_PATH;
 import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_KEY;
 import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_MOCK_VALUE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,7 +75,7 @@ class CustomerControllerTest {
         given(customerService.patchCustomerById(any(UUID.class), any(CustomerDTO.class)))
                 .willReturn(Optional.of(testCustomerDto));
 
-        mockMvc.perform(patch(CUSTOMER_PATH_ID, testCustomerDto.getId())
+        mockMvc.perform(patch(CUSTOMER_ID_PATH, testCustomerDto.getId())
                         .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -92,7 +92,7 @@ class CustomerControllerTest {
     void deleteCustomer() throws Exception {
         given(customerService.deleteCustomerById(any(UUID.class))).willReturn(true);
 
-        mockMvc.perform(delete(CUSTOMER_PATH_ID, testCustomerDto.getId())
+        mockMvc.perform(delete(CUSTOMER_ID_PATH, testCustomerDto.getId())
                         .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -107,7 +107,7 @@ class CustomerControllerTest {
         given(customerService.updateCustomerById(any(UUID.class), any(CustomerDTO.class)))
                 .willReturn(Optional.of(testCustomerDto));
 
-        mockMvc.perform(put(CUSTOMER_PATH_ID, testCustomerDto.getId())
+        mockMvc.perform(put(CUSTOMER_ID_PATH, testCustomerDto.getId())
                         .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -124,7 +124,7 @@ class CustomerControllerTest {
         testCustomerDto.setCustomerName("");
         given(customerService.updateCustomerById(any(UUID.class), any(CustomerDTO.class))).willReturn(Optional.of(testCustomerDto));
 
-        mockMvc.perform(put(CUSTOMER_PATH_ID, testCustomerDto.getId())
+        mockMvc.perform(put(CUSTOMER_ID_PATH, testCustomerDto.getId())
                         .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -148,7 +148,7 @@ class CustomerControllerTest {
                         .content(objectMapper.writeValueAsString(customerDTO)))
                 .andExpectAll(status().isCreated(),
                         header().exists("Location"),
-                        redirectedUrlTemplate(CUSTOMER_PATH_ID, testCustomerDto.getId()));
+                        redirectedUrlTemplate(CUSTOMER_ID_PATH, testCustomerDto.getId()));
     }
 
     @Test
@@ -185,7 +185,7 @@ class CustomerControllerTest {
 
         given(customerService.getCustomerById(any(UUID.class))).willReturn(optionalCustomerDto);
 
-        mockMvc.perform(get(CUSTOMER_PATH_ID, UUID.randomUUID())
+        mockMvc.perform(get(CUSTOMER_ID_PATH, UUID.randomUUID())
                         .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE))
                 .andExpect(status().isNotFound());
     }
@@ -196,7 +196,7 @@ class CustomerControllerTest {
 
         given(customerService.getCustomerById(customerDtoId)).willReturn(Optional.of(testCustomerDto));
 
-        mockMvc.perform(get(CUSTOMER_PATH_ID, testCustomerDto.getId())
+        mockMvc.perform(get(CUSTOMER_ID_PATH, testCustomerDto.getId())
                         .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

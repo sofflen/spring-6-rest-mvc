@@ -31,8 +31,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static com.study.spring6restmvc.controllers.BeerController.BEER_ID_PATH;
 import static com.study.spring6restmvc.controllers.BeerController.BEER_PATH;
-import static com.study.spring6restmvc.controllers.BeerController.BEER_PATH_ID;
 import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_GENERATED_VALUE;
 import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -264,7 +264,7 @@ class BeerControllerIntegrationTest {
         beerDto.setBeerName("updatedBeer");
 
         mockMvc.perform(
-                        put(BEER_PATH_ID, testBeer.getId())
+                        put(BEER_ID_PATH, testBeer.getId())
                                 .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -294,7 +294,7 @@ class BeerControllerIntegrationTest {
         var beerId = testBeer.getId();
 
         mockMvc.perform(
-                        delete(BEER_PATH_ID, beerId)
+                        delete(BEER_ID_PATH, beerId)
                                 .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE))
                 .andExpect(
                         status().isNoContent());
@@ -337,7 +337,7 @@ class BeerControllerIntegrationTest {
         beerDto.setBeerName("patchedBeer");
 
         mockMvc.perform(
-                        patch(BEER_PATH_ID, testBeer.getId())
+                        patch(BEER_ID_PATH, testBeer.getId())
                                 .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -358,7 +358,7 @@ class BeerControllerIntegrationTest {
 
 
         mockMvc.perform(
-                        patch(BEER_PATH_ID, testBeer.getId())
+                        patch(BEER_ID_PATH, testBeer.getId())
                                 .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)

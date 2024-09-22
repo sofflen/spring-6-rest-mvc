@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.study.spring6restmvc.controllers.BeerController.BEER_PATH;
-import static com.study.spring6restmvc.controllers.BeerController.BEER_PATH_ID;
+import static com.study.spring6restmvc.controllers.BeerController.BEER_ID_PATH;
 import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_KEY;
 import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_MOCK_VALUE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -78,7 +78,7 @@ class BeerControllerTest {
         given(beerService.patchBeerById(any(UUID.class), any(BeerDTO.class))).willReturn(Optional.of(testBeerDto));
 
         mockMvc.perform(
-                        patch(BEER_PATH_ID, testBeerDto.getId())
+                        patch(BEER_ID_PATH, testBeerDto.getId())
                                 .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -97,7 +97,7 @@ class BeerControllerTest {
         given(beerService.deleteBeerById(any(UUID.class))).willReturn(true);
 
         mockMvc.perform(
-                        delete(BEER_PATH_ID, testBeerDto.getId())
+                        delete(BEER_ID_PATH, testBeerDto.getId())
                                 .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(
@@ -113,7 +113,7 @@ class BeerControllerTest {
         given(beerService.updateBeerById(any(UUID.class), any(BeerDTO.class))).willReturn(Optional.of(testBeerDto));
 
         mockMvc.perform(
-                        put(BEER_PATH_ID, testBeerDto.getId())
+                        put(BEER_ID_PATH, testBeerDto.getId())
                                 .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -131,7 +131,7 @@ class BeerControllerTest {
         testBeerDto.setBeerName("");
         given(beerService.updateBeerById(any(UUID.class), any(BeerDTO.class))).willReturn(Optional.of(testBeerDto));
 
-        mockMvc.perform(put(BEER_PATH_ID, testBeerDto.getId())
+        mockMvc.perform(put(BEER_ID_PATH, testBeerDto.getId())
                         .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -161,7 +161,7 @@ class BeerControllerTest {
                 .andExpectAll(
                         status().isCreated(),
                         header().exists("Location"),
-                        redirectedUrlTemplate(BEER_PATH_ID, testBeerDto.getId()));
+                        redirectedUrlTemplate(BEER_ID_PATH, testBeerDto.getId()));
     }
 
     @Test
@@ -202,7 +202,7 @@ class BeerControllerTest {
         given(beerService.getBeerById(any(UUID.class))).willReturn(optionalBeerDto);
 
         mockMvc.perform(
-                        get(BEER_PATH_ID, UUID.randomUUID())
+                        get(BEER_ID_PATH, UUID.randomUUID())
                                 .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE))
                 .andExpect(
                         status().isNotFound());
@@ -215,7 +215,7 @@ class BeerControllerTest {
         given(beerService.getBeerById(beerDtoId)).willReturn(Optional.of(testBeerDto));
 
         mockMvc.perform(
-                        get(BEER_PATH_ID, beerDtoId)
+                        get(BEER_ID_PATH, beerDtoId)
                                 .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpectAll(

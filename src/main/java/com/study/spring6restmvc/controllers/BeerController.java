@@ -23,7 +23,7 @@ public class BeerController {
     private final BeerService beerService;
 
     public static final String BEER_PATH = "/api/v1/beer";
-    public static final String BEER_PATH_ID = "/api/v1/beer/{id}";
+    public static final String BEER_ID_PATH = BEER_PATH + "/{id}";
 
     @GetMapping(BEER_PATH)
     public PagedModel<BeerDTO> getAllBeers(@RequestParam(required = false) String beerName,
@@ -42,7 +42,7 @@ public class BeerController {
         return new PagedModel<>(beerPage);
     }
 
-    @GetMapping(BEER_PATH_ID)
+    @GetMapping(BEER_ID_PATH)
     public BeerDTO getBeerById(@PathVariable("id") UUID beerId) {
         log.info("BeerController: getBeerById({})", beerId);
 
@@ -61,7 +61,7 @@ public class BeerController {
         return new ResponseEntity<>(savedBeer, headers, HttpStatus.CREATED);
     }
 
-    @PutMapping(BEER_PATH_ID)
+    @PutMapping(BEER_ID_PATH)
     public ResponseEntity<BeerDTO> updateBeerById(@PathVariable("id") UUID beerId, @Validated @RequestBody BeerDTO beer) {
         log.info("BeerController: updateBeerById({})", beerId);
 
@@ -72,7 +72,7 @@ public class BeerController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping(BEER_PATH_ID)
+    @DeleteMapping(BEER_ID_PATH)
     public ResponseEntity<BeerDTO> deleteBeerById(@PathVariable("id") UUID beerId) {
         log.info("BeerController: deleteBeerById({})", beerId);
 
@@ -83,7 +83,7 @@ public class BeerController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PatchMapping(BEER_PATH_ID)
+    @PatchMapping(BEER_ID_PATH)
     public ResponseEntity<BeerDTO> patchBeerById(@PathVariable("id") UUID beerId, @RequestBody BeerDTO beer) {
         log.info("BeerController: patchBeerById({})", beerId);
 
