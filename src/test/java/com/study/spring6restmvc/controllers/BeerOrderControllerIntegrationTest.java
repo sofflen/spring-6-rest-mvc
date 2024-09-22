@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.config.JwtDecoderConfig;
 import com.study.spring6restmvc.entities.BeerOrder;
 import com.study.spring6restmvc.exceptions.NotFoundException;
+import com.study.spring6restmvc.mappers.BeerOrderShipmentMapper;
 import com.study.spring6restmvc.model.BeerOrderRequestBodyDTO;
 import com.study.spring6restmvc.repositories.BeerOrderRepository;
 import org.hamcrest.Matchers;
@@ -32,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -45,6 +47,8 @@ class BeerOrderControllerIntegrationTest {
     private BeerOrderController beerOrderController;
     @Autowired
     private BeerOrderRepository beerOrderRepository;
+    @Autowired
+    private BeerOrderShipmentMapper beerOrderShipmentMapper;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -149,5 +153,50 @@ class BeerOrderControllerIntegrationTest {
                                 .content(objectMapper.writeValueAsString(beerOrderCreateDto)))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists(HttpHeaders.LOCATION));
+    }
+
+    @Test
+    @Transactional
+    void testUpdateBeer() {
+        var beerOrderUpdateDto = BeerOrderRequestBodyDTO.builder()
+                .customerId(testBeerOrder.getCustomer().getId())
+                .beerOrderShipment(beerOrderShipmentMapper
+                        .beerOrderShipmentToBeerOrderShipmentDto(testBeerOrder.getBeerOrderShipment()))
+                .customerRef(testBeerOrder.getCustomerRef())
+                .build();
+        final String newCustomerRef = "New Customer Ref";
+
+        beerOrderUpdateDto.setCustomerRef(newCustomerRef);
+
+        var responseEntity = beerOrderController.updateBeerOrderById(testBeerOrder.getId(), beerOrderUpdateDto);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
+
+        var updatedBeerOrder = beerOrderRepository.findById(testBeerOrder.getId()).orElseThrow();
+
+        assertThat(updatedBeerOrder.getCustomerRef()).isEqualTo(newCustomerRef);
+    }
+
+    @Test
+    @Transactional
+    void testUpdateBeerMVC() throws Exception {
+        var beerOrderUpdateDto = BeerOrderRequestBodyDTO.builder()
+                .customerId(testBeerOrder.getCustomer().getId())
+                .beerOrderShipment(beerOrderShipmentMapper
+                        .beerOrderShipmentToBeerOrderShipmentDto(testBeerOrder.getBeerOrderShipment()))
+                .customerRef(testBeerOrder.getCustomerRef())
+                .build();
+
+        beerOrderUpdateDto.setCustomerRef("New Customer Ref");
+
+        mockMvc.perform(
+                        put(BEER_ORDER_ID_PATH, testBeerOrder.getId())
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(beerOrderUpdateDto)))
+                .andExpect(status().isNoContent());
+
+        assertThat(testBeerOrder.getCustomerRef()).isEqualTo(beerOrderUpdateDto.getCustomerRef());
     }
 }
