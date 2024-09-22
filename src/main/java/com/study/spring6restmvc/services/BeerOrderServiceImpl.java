@@ -1,6 +1,8 @@
 package com.study.spring6restmvc.services;
 
+import com.study.spring6restmvc.model.BeerOrderCreateDTO;
 import com.study.spring6restmvc.model.BeerOrderDTO;
+import com.study.spring6restmvc.model.CustomerDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -45,5 +47,25 @@ public class BeerOrderServiceImpl implements BeerOrderService {
     @Override
     public Page<BeerOrderDTO> getAll(Integer pageNumber, Integer pageSize) {
         return new PageImpl<>(new ArrayList<>(beerOrdersMap.values()));
+    }
+
+    @Override
+    public BeerOrderDTO save(BeerOrderCreateDTO beerOrderCreateDTO) {
+        var beerOrderDto = BeerOrderDTO.builder()
+                .id(UUID.randomUUID())
+                .version(0)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .customer(
+                        CustomerDTO.builder()
+                                .id(beerOrderCreateDTO.getCustomerId())
+                                .customerName("Beer Order Customer")
+                                .email("beer.order@fake.com")
+                                .build())
+                .build();
+
+        beerOrdersMap.put(beerOrderDto.getId(), beerOrderDto);
+
+        return beerOrderDto;
     }
 }

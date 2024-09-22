@@ -68,7 +68,7 @@ public class BeerOrder {
     }
 
     public void setBeerOrderLines(Set<BeerOrderLine> beerOrderLines) {
-        if (beerOrderLines != null) {
+        if (beerOrderLines != null && !beerOrderLines.isEmpty()) {
             beerOrderLines.forEach(beerOrderLine -> {
                 this.beerOrderLines.add(beerOrderLine);
                 beerOrderLine.setBeerOrder(this);

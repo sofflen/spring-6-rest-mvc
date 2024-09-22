@@ -8,4 +8,6 @@ import java.util.UUID;
 
 @Repository
 public interface BeerOrderShipmentRepository extends JpaRepository<BeerOrderShipment, UUID> {
+
+    BeerOrderShipment findByBeerOrderId(UUID beerOrderId);
 }
