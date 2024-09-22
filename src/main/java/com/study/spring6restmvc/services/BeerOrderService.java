@@ -1,7 +1,7 @@
 package com.study.spring6restmvc.services;
 
-import com.study.spring6restmvc.model.BeerOrderRequestBodyDTO;
 import com.study.spring6restmvc.model.BeerOrderDTO;
+import com.study.spring6restmvc.model.BeerOrderRequestBodyDTO;
 import org.springframework.data.domain.Page;
 
 import java.util.Optional;
@@ -13,5 +13,7 @@ public interface BeerOrderService {
 
     Page<BeerOrderDTO> getAll(Integer pageNumber, Integer pageSize);
 
-    BeerOrderDTO save(BeerOrderRequestBodyDTO beerOrderCreateDTO);
+    BeerOrderDTO save(BeerOrderRequestBodyDTO beerOrderCreateDto);
+
+    Optional<BeerOrderDTO> updateById(UUID beerOrderId, BeerOrderRequestBodyDTO beerOrderUpdateDto);
 }

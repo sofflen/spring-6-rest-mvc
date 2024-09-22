@@ -50,7 +50,7 @@ public class BeerOrderServiceImpl implements BeerOrderService {
     }
 
     @Override
-    public BeerOrderDTO save(BeerOrderRequestBodyDTO beerOrderCreateDTO) {
+    public BeerOrderDTO save(BeerOrderRequestBodyDTO beerOrderCreateDto) {
         var beerOrderDto = BeerOrderDTO.builder()
                 .id(UUID.randomUUID())
                 .version(0)
@@ -58,7 +58,7 @@ public class BeerOrderServiceImpl implements BeerOrderService {
                 .updatedAt(LocalDateTime.now())
                 .customer(
                         CustomerDTO.builder()
-                                .id(beerOrderCreateDTO.getCustomerId())
+                                .id(beerOrderCreateDto.getCustomerId())
                                 .customerName("Beer Order Customer")
                                 .email("beer.order@fake.com")
                                 .build())
@@ -67,5 +67,22 @@ public class BeerOrderServiceImpl implements BeerOrderService {
         beerOrdersMap.put(beerOrderDto.getId(), beerOrderDto);
 
         return beerOrderDto;
+    }
+
+    @Override
+    public Optional<BeerOrderDTO> updateById(UUID beerOrderId, BeerOrderRequestBodyDTO beerOrderUpdateDto) {
+        var existingBeerOrder = beerOrdersMap.get(beerOrderId);
+
+        existingBeerOrder.setCustomer(
+                CustomerDTO.builder()
+                        .id(beerOrderUpdateDto.getCustomerId())
+                        .customerName("Beer Order Customer")
+                        .email("beer.order@fake.com")
+                        .build());
+        existingBeerOrder.setCustomerRef(beerOrderUpdateDto.getCustomerRef());
+        existingBeerOrder.setBeerOrderShipment(beerOrderUpdateDto.getBeerOrderShipment());
+        existingBeerOrder.setUpdatedAt(LocalDateTime.now());
+
+        return Optional.of(existingBeerOrder);
     }
 }

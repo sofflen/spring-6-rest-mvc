@@ -1,8 +1,8 @@
 package com.study.spring6restmvc.controllers;
 
 import com.study.spring6restmvc.exceptions.NotFoundException;
-import com.study.spring6restmvc.model.BeerOrderRequestBodyDTO;
 import com.study.spring6restmvc.model.BeerOrderDTO;
+import com.study.spring6restmvc.model.BeerOrderRequestBodyDTO;
 import com.study.spring6restmvc.services.BeerOrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,5 +62,17 @@ public class BeerOrderController {
         headers.add("Location", BEER_ORDER_PATH + "/" + savedBeerOrder.getId());
 
         return new ResponseEntity<>(savedBeerOrder, headers, HttpStatus.CREATED);
+    }
+
+    @PutMapping(BEER_ORDER_ID_PATH)
+    public ResponseEntity<BeerOrderDTO> updateBeerOrderById(@PathVariable("id") UUID beerOrderId,
+                                                            @Validated @RequestBody BeerOrderRequestBodyDTO beerOrderDto) {
+        log.info("BeerOrderController: updateBeerOrderById({})", beerOrderId);
+
+        if (beerOrderService.updateById(beerOrderId, beerOrderDto).isEmpty()) {
+            throw new NotFoundException();
+        }
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
