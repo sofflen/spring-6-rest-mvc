@@ -79,12 +79,11 @@ public class BeerServiceJPA implements BeerService {
 
     @Override
     public BeerDTO saveBeer(BeerDTO beer) {
-        clearCache(null);
-
         var mappedBeer = beerMapper.beerDtoToBeer(beer);
         var savedBeer = beerRepository.save(mappedBeer);
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        clearCache(null);
         eventPublisher.publishEvent(new BeerCreatedEvent(savedBeer, authentication));
 
         return beerMapper.beerToBeerDTO(savedBeer);
@@ -96,8 +95,6 @@ public class BeerServiceJPA implements BeerService {
 
         beerRepository.findById(beerId).ifPresentOrElse(
                 foundBeer -> {
-                    clearCache(beerId);
-
                     foundBeer.setBeerName(beer.getBeerName());
                     foundBeer.setBeerStyle(beer.getBeerStyle());
                     foundBeer.setUpc(beer.getUpc());
@@ -108,6 +105,7 @@ public class BeerServiceJPA implements BeerService {
                     var savedBeer = beerRepository.save(foundBeer);
                     var authentication = SecurityContextHolder.getContext().getAuthentication();
 
+                    clearCache(beerId);
                     eventPublisher.publishEvent(new BeerUpdatedEvent(savedBeer, authentication));
 
                     atomicReference.set(beerMapper.beerToBeerDTO(savedBeer));
@@ -122,8 +120,8 @@ public class BeerServiceJPA implements BeerService {
         if (beerRepository.existsById(beerId)) {
             var authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            clearCache(beerId);
             beerRepository.deleteById(beerId);
+            clearCache(beerId);
             eventPublisher.publishEvent(new BeerDeletedEvent(Beer.builder().id(beerId).build(), authentication));
             return true;
         }
@@ -136,8 +134,6 @@ public class BeerServiceJPA implements BeerService {
 
         beerRepository.findById(beerId).ifPresentOrElse(
                 foundBeer -> {
-                    clearCache(beerId);
-
                     if (hasText(beer.getBeerName()))
                         foundBeer.setBeerName(beer.getBeerName());
                     if (beer.getBeerStyle() != null)
@@ -155,6 +151,7 @@ public class BeerServiceJPA implements BeerService {
                     var savedBeer = beerRepository.save(foundBeer);
                     var authentication = SecurityContextHolder.getContext().getAuthentication();
 
+                    clearCache(beerId);
                     eventPublisher.publishEvent(new BeerPatchedEvent(savedBeer, authentication));
                     atomicReference.set(beerMapper.beerToBeerDTO(savedBeer));
                 },
