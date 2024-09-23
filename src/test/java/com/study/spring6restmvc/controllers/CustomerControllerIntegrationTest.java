@@ -10,6 +10,7 @@ import com.study.spring6restmvc.events.customer.CustomerUpdatedEvent;
 import com.study.spring6restmvc.exceptions.NotFoundException;
 import com.study.spring6restmvc.mappers.CustomerMapper;
 import com.study.spring6restmvc.model.CustomerDTO;
+import com.study.spring6restmvc.repositories.BeerOrderRepository;
 import com.study.spring6restmvc.repositories.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_PATH;
-import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_PATH_ID;
+import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_ID_PATH;
 import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_GENERATED_VALUE;
 import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -237,7 +238,7 @@ class CustomerControllerIntegrationTest {
         customerDto.setCustomerName("Updated Customer");
 
         mockMvc.perform(
-                        put(CUSTOMER_PATH_ID, testCustomer.getId())
+                        put(CUSTOMER_ID_PATH, testCustomer.getId())
                                 .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -267,7 +268,7 @@ class CustomerControllerIntegrationTest {
         var customerId = testCustomer.getId();
 
         mockMvc.perform(
-                        delete(CUSTOMER_PATH_ID, customerId)
+                        delete(CUSTOMER_ID_PATH, customerId)
                                 .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE))
                 .andExpect(
                         status().isNoContent());
@@ -310,7 +311,7 @@ class CustomerControllerIntegrationTest {
         customerDto.setCustomerName("Patched Beer");
 
         mockMvc.perform(
-                        patch(CUSTOMER_PATH_ID, testCustomer.getId())
+                        patch(CUSTOMER_ID_PATH, testCustomer.getId())
                                 .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -331,7 +332,7 @@ class CustomerControllerIntegrationTest {
 
 
         mockMvc.perform(
-                        patch(CUSTOMER_PATH_ID, testCustomer.getId())
+                        patch(CUSTOMER_ID_PATH, testCustomer.getId())
                                 .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)

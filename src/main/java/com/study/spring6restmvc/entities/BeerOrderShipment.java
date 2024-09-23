@@ -4,9 +4,9 @@ package com.study.spring6restmvc.entities;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -40,8 +40,8 @@ public class BeerOrderShipment {
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+    @NotBlank
     private String trackingNumber;
-    @OneToOne
-    @JoinColumn(name = "beer_order_id")
+    @OneToOne(mappedBy = "beerOrderShipment")
     private BeerOrder beerOrder;
 }

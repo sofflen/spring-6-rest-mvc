@@ -2,6 +2,7 @@ package com.study.spring6restmvc.bootstrap;
 
 import com.study.spring6restmvc.model.BeerCsvRecord;
 import com.study.spring6restmvc.model.CustomerCsvRecord;
+import com.study.spring6restmvc.repositories.BeerOrderRepository;
 import com.study.spring6restmvc.repositories.BeerRepository;
 import com.study.spring6restmvc.repositories.CustomerRepository;
 import com.study.spring6restmvc.services.BeerCsvService;
@@ -24,6 +25,8 @@ class BootstrapDataTest {
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
+    private BeerOrderRepository beerOrderRepository;
+    @Autowired
     private CsvService<BeerCsvRecord> beerCsvService;
     @Autowired
     CsvService<CustomerCsvRecord> customerCsvService;
@@ -32,7 +35,7 @@ class BootstrapDataTest {
 
     @BeforeEach
     void setUp() {
-        bootstrapData = new BootstrapData(beerRepository, customerRepository, beerCsvService, customerCsvService);
+        bootstrapData = new BootstrapData(beerRepository, customerRepository, beerOrderRepository, beerCsvService, customerCsvService);
     }
 
     @Test

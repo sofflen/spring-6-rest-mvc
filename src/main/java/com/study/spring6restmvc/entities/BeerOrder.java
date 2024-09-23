@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,10 +33,11 @@ public class BeerOrder {
     private LocalDateTime updatedAt;
     private String customerRef;
     @ManyToOne
+    @JoinColumn(name = "customer_id")
     private Customer customer;
-    @OneToMany(mappedBy = "beerOrder")
-    private Set<BeerOrderLine> beerOrderLines;
-    @OneToOne(mappedBy = "beerOrder", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "beerOrder", cascade = CascadeType.ALL)
+    private Set<BeerOrderLine> beerOrderLines = new HashSet<>();
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "beer_order_shipment_id")
     private BeerOrderShipment beerOrderShipment;
 
@@ -47,17 +49,37 @@ public class BeerOrder {
         this.updatedAt = updatedAt;
         this.customerRef = customerRef;
         this.setCustomer(customer);
-        this.beerOrderLines = beerOrderLines;
+        this.setBeerOrderLines(beerOrderLines);
         this.setBeerOrderShipment(beerOrderShipment);
     }
 
     public void setCustomer(Customer customer) {
-        this.customer = customer;
-        customer.getBeerOrders().add(this);
+        if (customer != null) {
+            this.customer = customer;
+            customer.getBeerOrders().add(this);
+        }
     }
 
     public void setBeerOrderShipment(BeerOrderShipment beerOrderShipment) {
-        this.beerOrderShipment = beerOrderShipment;
-        beerOrderShipment.setBeerOrder(this);
+        if (beerOrderShipment != null) {
+            this.beerOrderShipment = beerOrderShipment;
+            beerOrderShipment.setBeerOrder(this);
+        }
+    }
+
+    public void setBeerOrderLines(Set<BeerOrderLine> beerOrderLines) {
+        if (beerOrderLines != null && !beerOrderLines.isEmpty()) {
+            beerOrderLines.forEach(beerOrderLine -> {
+                this.beerOrderLines.add(beerOrderLine);
+                beerOrderLine.setBeerOrder(this);
+            });
+        }
+    }
+
+    public void addBeerOrderLines(BeerOrderLine... beerOrderLines) {
+        for (BeerOrderLine beerOrderLine : beerOrderLines) {
+            this.beerOrderLines.add(beerOrderLine);
+            beerOrderLine.setBeerOrder(this);
+        }
     }
 }

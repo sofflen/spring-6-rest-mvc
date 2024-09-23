@@ -74,12 +74,11 @@ public class CustomerServiceJPA implements CustomerService {
 
     @Override
     public CustomerDTO saveCustomer(CustomerDTO customer) {
-        clearCache(null);
-
         var mappedCustomer = customerMapper.customerDtoToCustomer(customer);
         var savedCustomer = customerRepository.save(mappedCustomer);
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        clearCache(null);
         eventPublisher.publishEvent(new CustomerCreatedEvent(savedCustomer, authentication));
 
         return customerMapper.customerToCustomerDTO(savedCustomer);
@@ -91,8 +90,6 @@ public class CustomerServiceJPA implements CustomerService {
 
         customerRepository.findById(customerId).ifPresentOrElse(
                 foundCustomer -> {
-                    clearCache(customerId);
-
                     if (StringUtils.hasText(customer.getCustomerName())) {
                         foundCustomer.setCustomerName(customer.getCustomerName());
                     }
@@ -101,6 +98,7 @@ public class CustomerServiceJPA implements CustomerService {
                     var updatedCustomer = customerRepository.save(foundCustomer);
                     var authentication = SecurityContextHolder.getContext().getAuthentication();
 
+                    clearCache(customerId);
                     eventPublisher.publishEvent(new CustomerUpdatedEvent(updatedCustomer, authentication));
 
                     atomicReference.set(
@@ -116,8 +114,8 @@ public class CustomerServiceJPA implements CustomerService {
         if (customerRepository.existsById(customerId)) {
             var authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            clearCache(customerId);
             customerRepository.deleteById(customerId);
+            clearCache(customerId);
             eventPublisher.publishEvent(new CustomerDeletedEvent(Customer.builder().id(customerId).build(), authentication));
             return true;
         }
@@ -130,8 +128,6 @@ public class CustomerServiceJPA implements CustomerService {
 
         customerRepository.findById(customerId).ifPresentOrElse(
                 foundCustomer -> {
-                    clearCache(customerId);
-
                     if (customer.getCustomerName() != null) {
                         foundCustomer.setCustomerName(customer.getCustomerName());
                     }
@@ -140,6 +136,7 @@ public class CustomerServiceJPA implements CustomerService {
                     var patchedCustomer = customerRepository.save(foundCustomer);
                     var authentication = SecurityContextHolder.getContext().getAuthentication();
 
+                    clearCache(customerId);
                     eventPublisher.publishEvent(new CustomerPatchedEvent(patchedCustomer, authentication));
 
                     atomicReference.set(
