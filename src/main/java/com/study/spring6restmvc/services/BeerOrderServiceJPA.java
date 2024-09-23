@@ -98,38 +98,41 @@ public class BeerOrderServiceJPA implements BeerOrderService {
                     foundBeerOrder.setCustomerRef(beerOrderUpdateDto.getCustomerRef());
                     foundBeerOrder.setUpdatedAt(LocalDateTime.now());
 
-                    if (beerOrderUpdateDto.getOrderLines() != null) {
-                        Set<BeerOrderLine> lines = new HashSet<>();
-                        beerOrderUpdateDto.getOrderLines()
-                                .forEach(orderLine -> {
-                                    var line = BeerOrderLine.builder()
-                                            .beer(beerRepository
-                                                    .findById(orderLine.getBeerId())
-                                                    .orElseThrow(NotFoundException::new))
-                                            .orderQuantity(orderLine.getOrderQuantity())
-                                            .quantityAllocated(orderLine.getQuantityAllocated())
-                                            .build();
-                                    lines.add(line);
-                                });
-                        foundBeerOrder.setBeerOrderLines(lines);
+                    updateBeerOrderLines(beerOrderUpdateDto, foundBeerOrder);
+
+                    updateBeerOrderShipment(beerOrderUpdateDto, foundBeerOrder);
+
+                    var updatedBeerOrder = beerOrderRepository.save(foundBeerOrder);
+
+                    atomicReference.set(beerOrderMapper.beerOrderToBeerOrderDto(updatedBeerOrder));
+                },
+                () -> atomicReference.set(null));
+
+        return Optional.ofNullable(atomicReference.get());
+    }
+
+    @Override
+    public Optional<BeerOrderDTO> patchById(UUID beerOrderId, BeerOrderRequestBodyDTO beerOrderPatchDto) {
+        AtomicReference<BeerOrderDTO> atomicReference = new AtomicReference<>();
+
+        beerOrderRepository.findById(beerOrderId).ifPresentOrElse(
+                foundBeerOrder -> {
+                    if (beerOrderPatchDto.getCustomerRef() != null) {
+                        foundBeerOrder.setCustomer(customerRepository
+                                .findById(beerOrderPatchDto.getCustomerId())
+                                .orElseThrow(NotFoundException::new));
+                    }
+                    if (beerOrderPatchDto.getCustomerRef() != null) {
+                        foundBeerOrder.setCustomerRef(beerOrderPatchDto.getCustomerRef());
                     }
 
-                    if (beerOrderUpdateDto.getBeerOrderShipment() != null
-                            && beerOrderUpdateDto.getBeerOrderShipment().getTrackingNumber() != null) {
-                        var trackingNumber = beerOrderUpdateDto.getBeerOrderShipment().getTrackingNumber();
+                    updateBeerOrderLines(beerOrderPatchDto, foundBeerOrder);
 
-                        if (foundBeerOrder.getBeerOrderShipment() == null) {
-                            foundBeerOrder.setBeerOrderShipment(BeerOrderShipment.builder()
-                                    .trackingNumber(trackingNumber)
-                                    .build());
-                        } else {
-                            foundBeerOrder.getBeerOrderShipment().setTrackingNumber(trackingNumber);
-                        }
-                    }
+                    updateBeerOrderShipment(beerOrderPatchDto, foundBeerOrder);
 
-                    var savedBeerOrder = beerOrderRepository.save(foundBeerOrder);
+                    var patchedBeerOrder = beerOrderRepository.save(foundBeerOrder);
 
-                    atomicReference.set(beerOrderMapper.beerOrderToBeerOrderDto(savedBeerOrder));
+                    atomicReference.set(beerOrderMapper.beerOrderToBeerOrderDto(patchedBeerOrder));
                 },
                 () -> atomicReference.set(null));
 
@@ -143,5 +146,44 @@ public class BeerOrderServiceJPA implements BeerOrderService {
             return true;
         }
         return false;
+    }
+
+    private void updateBeerOrderLines(BeerOrderRequestBodyDTO beerOrderUpdateDto, BeerOrder foundBeerOrder) {
+        if (beerOrderUpdateDto.getOrderLines() == null) {
+            return;
+        }
+
+        Set<BeerOrderLine> lines = new HashSet<>();
+
+        beerOrderUpdateDto.getOrderLines()
+                .forEach(orderLine -> {
+                    var line = BeerOrderLine.builder()
+                            .beer(beerRepository
+                                    .findById(orderLine.getBeerId())
+                                    .orElseThrow(NotFoundException::new))
+                            .orderQuantity(orderLine.getOrderQuantity())
+                            .quantityAllocated(orderLine.getQuantityAllocated())
+                            .build();
+                    lines.add(line);
+                });
+
+        foundBeerOrder.setBeerOrderLines(lines);
+    }
+
+    private void updateBeerOrderShipment(BeerOrderRequestBodyDTO beerOrderUpdateDto, BeerOrder foundBeerOrder) {
+        if (beerOrderUpdateDto.getBeerOrderShipment() == null
+                || beerOrderUpdateDto.getBeerOrderShipment().getTrackingNumber() == null) {
+            return;
+        }
+
+        var trackingNumber = beerOrderUpdateDto.getBeerOrderShipment().getTrackingNumber();
+
+        if (foundBeerOrder.getBeerOrderShipment() == null) {
+            foundBeerOrder.setBeerOrderShipment(BeerOrderShipment.builder()
+                    .trackingNumber(trackingNumber)
+                    .build());
+        } else {
+            foundBeerOrder.getBeerOrderShipment().setTrackingNumber(trackingNumber);
+        }
     }
 }

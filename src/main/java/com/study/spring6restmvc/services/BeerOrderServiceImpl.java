@@ -87,6 +87,30 @@ public class BeerOrderServiceImpl implements BeerOrderService {
     }
 
     @Override
+    public Optional<BeerOrderDTO> patchById(UUID beerOrderId, BeerOrderRequestBodyDTO beerOrderPatchDto) {
+        var existingBeerOrder = beerOrdersMap.get(beerOrderId);
+
+        if (beerOrderPatchDto.getCustomerId() != null) {
+            existingBeerOrder.setCustomer(
+                    CustomerDTO.builder()
+                            .id(beerOrderPatchDto.getCustomerId())
+                            .customerName("Beer Order Customer")
+                            .email("beer.order@fake.com")
+                            .build());
+        }
+        if (beerOrderPatchDto.getCustomerRef() != null) {
+            existingBeerOrder.setCustomerRef(beerOrderPatchDto.getCustomerRef());
+        }
+        if (beerOrderPatchDto.getBeerOrderShipment() != null) {
+            existingBeerOrder.setBeerOrderShipment(beerOrderPatchDto.getBeerOrderShipment());
+        }
+
+        existingBeerOrder.setUpdatedAt(LocalDateTime.now());
+
+        return Optional.of(existingBeerOrder);
+    }
+
+    @Override
     public boolean deleteById(UUID beerOrderId) {
         beerOrdersMap.remove(beerOrderId);
         return true;

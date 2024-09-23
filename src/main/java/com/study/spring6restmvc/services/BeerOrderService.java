@@ -17,5 +17,7 @@ public interface BeerOrderService {
 
     Optional<BeerOrderDTO> updateById(UUID beerOrderId, BeerOrderRequestBodyDTO beerOrderUpdateDto);
 
+    Optional<BeerOrderDTO> patchById(UUID beerOrderId, BeerOrderRequestBodyDTO beerOrderPatchDto);
+
     boolean deleteById(UUID beerOrderId);
 }
