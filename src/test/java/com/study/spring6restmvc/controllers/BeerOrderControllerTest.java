@@ -35,6 +35,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -157,6 +158,30 @@ class BeerOrderControllerTest {
                         status().isNoContent());
 
         verify(beerOrderService).updateById(uuidArgumentCaptor.capture(), eq(testBeerOrderUpdateDto));
+
+        assertThat(uuidArgumentCaptor.getValue()).isEqualTo(testBeerOrderDto.getId());
+    }
+
+    @Test
+    void patchBeerById() throws Exception {
+        var testBeerOrderPatchDto = BeerOrderRequestBodyDTO.builder()
+                .customerId(UUID.randomUUID())
+                .beerOrderShipment(BeerOrderShipmentDTO.builder().trackingNumber("trackingNumber").build())
+                .customerRef("customer ref")
+                .build();
+
+        given(beerOrderService.patchById(any(UUID.class), any(BeerOrderRequestBodyDTO.class))).willReturn(Optional.of(testBeerOrderDto));
+
+        mockMvc.perform(
+                        patch(BEER_ORDER_ID_PATH, testBeerOrderDto.getId())
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_MOCK_VALUE)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(testBeerOrderPatchDto)))
+                .andExpect(
+                        status().isNoContent());
+
+        verify(beerOrderService).patchById(uuidArgumentCaptor.capture(), eq(testBeerOrderPatchDto));
 
         assertThat(uuidArgumentCaptor.getValue()).isEqualTo(testBeerOrderDto.getId());
     }

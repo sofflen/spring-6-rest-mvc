@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -199,6 +200,51 @@ class BeerOrderControllerIntegrationTest {
                 .andExpect(status().isNoContent());
 
         assertThat(testBeerOrder.getCustomerRef()).isEqualTo(beerOrderUpdateDto.getCustomerRef());
+    }
+
+    @Test
+    @Transactional
+    void testPatchBeer() {
+        var beerOrderPatchDto = BeerOrderRequestBodyDTO.builder()
+                .customerId(testBeerOrder.getCustomer().getId())
+                .beerOrderShipment(beerOrderShipmentMapper
+                        .beerOrderShipmentToBeerOrderShipmentDto(testBeerOrder.getBeerOrderShipment()))
+                .customerRef(testBeerOrder.getCustomerRef())
+                .build();
+        final String newCustomerRef = "New Customer Ref";
+
+        beerOrderPatchDto.setCustomerRef(newCustomerRef);
+
+        var responseEntity = beerOrderController.patchBeerOrderById(testBeerOrder.getId(), beerOrderPatchDto);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
+
+        var patchedBeerOrder = beerOrderRepository.findById(testBeerOrder.getId()).orElseThrow();
+
+        assertThat(patchedBeerOrder.getCustomerRef()).isEqualTo(newCustomerRef);
+    }
+
+    @Test
+    @Transactional
+    void testPatchBeerMvc() throws Exception {
+        var beerOrderPatchDto = BeerOrderRequestBodyDTO.builder()
+                .customerId(testBeerOrder.getCustomer().getId())
+                .beerOrderShipment(beerOrderShipmentMapper
+                        .beerOrderShipmentToBeerOrderShipmentDto(testBeerOrder.getBeerOrderShipment()))
+                .customerRef(testBeerOrder.getCustomerRef())
+                .build();
+
+        beerOrderPatchDto.setCustomerRef("New Customer Ref");
+
+        mockMvc.perform(
+                        patch(BEER_ORDER_ID_PATH, testBeerOrder.getId())
+                                .header(AUTH_HEADER_KEY, AUTH_HEADER_GENERATED_VALUE)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(beerOrderPatchDto)))
+                .andExpect(status().isNoContent());
+
+        assertThat(testBeerOrder.getCustomerRef()).isEqualTo(beerOrderPatchDto.getCustomerRef());
     }
 
     @Test
