@@ -1,6 +1,7 @@
 package com.study.spring6restmvc.services;
 
-import com.study.spring6restmvc.model.CustomerDTO;
+
+import com.study.spring6restmvcapi.model.CustomerDTO;
 import org.springframework.data.domain.Page;
 
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package com.study.spring6restmvc.mappers;
 
 import com.study.spring6restmvc.entities.BeerOrderShipment;
-import com.study.spring6restmvc.model.BeerOrderShipmentDTO;
+import com.study.spring6restmvcapi.model.BeerOrderShipmentDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

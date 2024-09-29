@@ -1,7 +1,7 @@
 package com.study.spring6restmvc.services;
 
-import com.study.spring6restmvc.model.BeerOrderDTO;
-import com.study.spring6restmvc.model.BeerOrderRequestBodyDTO;
+import com.study.spring6restmvcapi.model.BeerOrderDTO;
+import com.study.spring6restmvcapi.model.BeerOrderRequestBodyDTO;
 import org.springframework.data.domain.Page;
 
 import java.util.Optional;

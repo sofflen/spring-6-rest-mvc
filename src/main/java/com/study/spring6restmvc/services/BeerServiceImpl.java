@@ -1,7 +1,7 @@
 package com.study.spring6restmvc.services;
 
-import com.study.spring6restmvc.model.BeerDTO;
-import com.study.spring6restmvc.model.BeerStyle;
+import com.study.spring6restmvcapi.model.BeerDTO;
+import com.study.spring6restmvcapi.model.BeerStyle;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

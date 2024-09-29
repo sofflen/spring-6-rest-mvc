@@ -1,8 +1,8 @@
 package com.study.spring6restmvc.controllers;
 
 import com.study.spring6restmvc.exceptions.NotFoundException;
-import com.study.spring6restmvc.model.CustomerDTO;
 import com.study.spring6restmvc.services.CustomerService;
+import com.study.spring6restmvcapi.model.CustomerDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.web.PagedModel;

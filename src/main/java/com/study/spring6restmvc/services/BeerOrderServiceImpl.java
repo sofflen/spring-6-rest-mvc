@@ -1,8 +1,8 @@
 package com.study.spring6restmvc.services;
 
-import com.study.spring6restmvc.model.BeerOrderRequestBodyDTO;
-import com.study.spring6restmvc.model.BeerOrderDTO;
-import com.study.spring6restmvc.model.CustomerDTO;
+import com.study.spring6restmvcapi.model.BeerOrderDTO;
+import com.study.spring6restmvcapi.model.BeerOrderRequestBodyDTO;
+import com.study.spring6restmvcapi.model.CustomerDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

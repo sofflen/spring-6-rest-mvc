@@ -2,9 +2,9 @@ package com.study.spring6restmvc.repositories;
 
 import com.study.spring6restmvc.bootstrap.BootstrapData;
 import com.study.spring6restmvc.entities.Beer;
-import com.study.spring6restmvc.model.BeerStyle;
 import com.study.spring6restmvc.services.BeerCsvService;
 import com.study.spring6restmvc.services.CustomerCsvService;
+import com.study.spring6restmvcapi.model.BeerStyle;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.study.spring6restmvc.entities;
 
-import com.study.spring6restmvc.model.BeerStyle;
+import com.study.spring6restmvcapi.model.BeerStyle;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

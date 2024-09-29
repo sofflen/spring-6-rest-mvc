@@ -2,9 +2,9 @@ package com.study.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.config.JwtDecoderMockConfig;
-import com.study.spring6restmvc.model.CustomerDTO;
 import com.study.spring6restmvc.services.CustomerService;
 import com.study.spring6restmvc.services.CustomerServiceImpl;
+import com.study.spring6restmvcapi.model.CustomerDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_PATH;
 import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_ID_PATH;
+import static com.study.spring6restmvc.controllers.CustomerController.CUSTOMER_PATH;
 import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_KEY;
 import static com.study.spring6restmvc.util.TestUtils.AUTH_HEADER_MOCK_VALUE;
 import static org.assertj.core.api.Assertions.assertThat;

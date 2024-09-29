@@ -2,11 +2,11 @@ package com.study.spring6restmvc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.spring6restmvc.config.JwtDecoderMockConfig;
-import com.study.spring6restmvc.model.BeerOrderDTO;
-import com.study.spring6restmvc.model.BeerOrderRequestBodyDTO;
-import com.study.spring6restmvc.model.BeerOrderShipmentDTO;
 import com.study.spring6restmvc.services.BeerOrderService;
 import com.study.spring6restmvc.services.BeerOrderServiceImpl;
+import com.study.spring6restmvcapi.model.BeerOrderDTO;
+import com.study.spring6restmvcapi.model.BeerOrderRequestBodyDTO;
+import com.study.spring6restmvcapi.model.BeerOrderShipmentDTO;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

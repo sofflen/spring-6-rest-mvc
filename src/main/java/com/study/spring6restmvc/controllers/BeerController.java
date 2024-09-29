@@ -1,9 +1,9 @@
 package com.study.spring6restmvc.controllers;
 
 import com.study.spring6restmvc.exceptions.NotFoundException;
-import com.study.spring6restmvc.model.BeerDTO;
-import com.study.spring6restmvc.model.BeerStyle;
 import com.study.spring6restmvc.services.BeerService;
+import com.study.spring6restmvcapi.model.BeerDTO;
+import com.study.spring6restmvcapi.model.BeerStyle;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.web.PagedModel;
