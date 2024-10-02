@@ -8,10 +8,12 @@ import com.study.spring6restmvc.mappers.BeerOrderMapper;
 import com.study.spring6restmvc.repositories.BeerOrderRepository;
 import com.study.spring6restmvc.repositories.BeerRepository;
 import com.study.spring6restmvc.repositories.CustomerRepository;
+import com.study.spring6restmvcapi.events.OrderPlacedEvent;
 import com.study.spring6restmvcapi.model.BeerOrderDTO;
 import com.study.spring6restmvcapi.model.BeerOrderRequestBodyDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +37,7 @@ public class BeerOrderServiceJPA implements BeerOrderService {
     private final CustomerRepository customerRepository;
     private final BeerRepository beerRepository;
     private final BeerOrderMapper beerOrderMapper;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public Optional<BeerOrderDTO> getById(UUID beerOrderId) {
@@ -103,8 +106,15 @@ public class BeerOrderServiceJPA implements BeerOrderService {
                     updateBeerOrderShipment(beerOrderUpdateDto, foundBeerOrder);
 
                     var updatedBeerOrder = beerOrderRepository.save(foundBeerOrder);
+                    var updatedBeerOrderDto = beerOrderMapper.beerOrderToBeerOrderDto(updatedBeerOrder);
 
-                    atomicReference.set(beerOrderMapper.beerOrderToBeerOrderDto(updatedBeerOrder));
+                    if (updatedBeerOrderDto.getPaymentAmount() != null) {
+                        applicationEventPublisher.publishEvent(OrderPlacedEvent.builder()
+                                .beerOrderDTO(updatedBeerOrderDto)
+                                .build());
+                    }
+
+                    atomicReference.set(updatedBeerOrderDto);
                 },
                 () -> atomicReference.set(null));
 
